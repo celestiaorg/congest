@@ -1,0 +1,7 @@
+name: congest
+runtime: go
+description: spin up nodes in digital ocean for a testnet
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: digitalocean-go

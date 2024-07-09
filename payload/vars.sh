@@ -1,0 +1,4 @@
+#!/bin/bash
+
+CHAIN_ID="congest"
+CELESTIA_APP_COMMIT="776aeb966766d4251c1b076fd2f5fcba3289ad37"
