@@ -29,6 +29,7 @@ type NodeInfo struct {
 	Name           string `json:"name"`
 	IP             string `json:"ip"`
 	NetworkAddress string `json:"network_address"`
+	Region         string `json:"region"`
 }
 
 func (n NodeInfo) PeerID() string {
@@ -71,10 +72,11 @@ func NewNetwork(chainID string) (*Network, error) {
 // its name which is assigned by pulumi as hardware is allocated. An addional
 // account and keyring are saved to the payload directory that can be used by
 // txsim.
-func (n *Network) AddValidator(name, ip, payLoadRoot string) error {
+func (n *Network) AddValidator(name, ip, payLoadRoot, region string) error {
 	n.validators[name] = NodeInfo{
-		Name: name,
-		IP:   ip,
+		Name:   name,
+		IP:     ip,
+		Region: region,
 	}
 
 	err := n.genesis.NewValidator(genesis.NewDefaultValidator(name))

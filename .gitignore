@@ -4,4 +4,5 @@ payload/validator-*
 payload/addrbook.json
 payload/genesis.json
 payload/validators.json
+payload/ips.json
 *jsonl

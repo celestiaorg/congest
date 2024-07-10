@@ -9,5 +9,5 @@ DROPLET_IPS=$(echo "$STACK_OUTPUT" | jq -r '.[]')
 for IP in $DROPLET_IPS; do
   echo "booting $IP -----------------------------------------------------"
   ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$IP" \
-  "tmux new-session -d -s init_install 'source /root/payload/init_install.sh'"
+  "tmux new -d -s init_install 'source /root/payload/init_install.sh'"
 done

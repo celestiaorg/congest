@@ -2,6 +2,9 @@
 
 CELES_HOME=".celestia-app"
 MONIKER="validator"
+ARCHIVE_NAME="payload.tar.gz"
+
+tar -xzf /root/$ARCHIVE_NAME -C /root/
 
 source ./vars.sh
 
