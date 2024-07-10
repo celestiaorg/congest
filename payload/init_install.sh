@@ -19,6 +19,7 @@ git clone https://github.com/celestiaorg/celestia-app
 cd celestia-app
 git checkout $CELESTIA_APP_COMMIT
 make install
+make txsim-install
 
 celestia-appd config chain-id $CHAIN_ID
 
@@ -34,14 +35,18 @@ parsed_hostname=$(echo $hostname | awk -F'-' '{print $1 "-" $2}')
 
 mv payload/$parsed_hostname/node_key.json $HOME/$CELES_HOME/config/node_key.json
 
-mv payload/$parsed_hostname/priv_validator_key.json $HOME/$CELES_HOME/priv_validator_key.json
+mv payload/$parsed_hostname/priv_validator_key.json $HOME/$CELES_HOME/config/priv_validator_key.json
+
+mv payload/$parsed_hostname/priv_validator_state.json $HOME/$CELES_HOME/data/priv_validator_state.json
 
 cp payload/genesis.json $HOME/$CELES_HOME/config/genesis.json
 
 cp payload/addrbook.json $HOME/$CELES_HOME/config/addrbook.json
 
-cp payload/$parsed_hostname/app.toml $HOME/$CELES_HOME/config/app.toml
+mv payload/$parsed_hostname/app.toml $HOME/$CELES_HOME/config/app.toml
 
-cp payload/$parsed_hostname/config.toml $HOME/$CELES_HOME/config/config.toml
+mv payload/$parsed_hostname/config.toml $HOME/$CELES_HOME/config/config.toml
+
+cp -r payload/$parsed_hostname/keyring-test $HOME/$CELES_HOME
 
 celestia-appd start

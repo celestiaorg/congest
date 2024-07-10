@@ -3,7 +3,9 @@ package main
 import (
 	"congest/cmd/netgen"
 	"fmt"
+	"log"
 	"path/filepath"
+	"sync"
 
 	"github.com/pulumi/pulumi-digitalocean/sdk/v4/go/digitalocean"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
@@ -25,15 +27,18 @@ var (
 )
 
 func main() {
+	payloadRoot := "./payload"
+
+	// Call the function to generate the network with the provided arguments
+	n, err := netgen.NewNetwork(ChainID)
+	if err != nil {
+		panic(err)
+	}
+
+	wg := &sync.WaitGroup{}
+
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cursor := 0
-		payloadRoot := "./payload"
-
-		// Call the function to generate the network with the provided arguments
-		n, err := netgen.NewNetwork(ChainID)
-		if err != nil {
-			return err
-		}
 
 		for region, count := range TestRegions {
 			for j := 0; j < count; j++ {
@@ -51,28 +56,36 @@ func main() {
 				// Add outputs to get the droplet IP addresses
 				ctx.Export(vname, droplet.Ipv4Address)
 
-				var parsedIPV4 string
+				wg.Add(1)
 				droplet.Ipv4Address.ApplyT(func(ip string) string {
-					parsedIPV4 = ip
+					defer wg.Done()
+					err = n.AddValidator(vname, ip, payloadRoot)
+					if err != nil {
+						panic(err)
+					}
+
 					return ip
 				})
-
-				err = n.AddValidator(vname, parsedIPV4, payloadRoot)
-				if err != nil {
-					return err
-				}
 
 				cursor++
 			}
 		}
-
-		n.InitNodes(payloadRoot)
-		n.SaveValidatorsToFile(filepath.Join(payloadRoot, "validators.json"))
-		err = n.SaveAddressBook(payloadRoot, n.Peers())
-		if err != nil {
-			return err
-		}
-
+		go func() {
+			wg.Wait()
+			err = n.InitNodes(payloadRoot)
+			if err != nil {
+				log.Fatal(err)
+			}
+			err = n.SaveValidatorsToFile(filepath.Join(payloadRoot, "validators.json"))
+			if err != nil {
+				log.Fatal(err)
+			}
+			err = n.SaveAddressBook(payloadRoot, n.Peers())
+			if err != nil {
+				log.Fatal(err)
+			}
+		}()
 		return nil
 	})
+
 }

@@ -1,2 +1,7 @@
 /vendor/
 token.sh
+payload/validator-*
+payload/addrbook.json
+payload/genesis.json
+payload/validators.json
+*jsonl

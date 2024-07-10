@@ -11,6 +11,7 @@ import (
 	"github.com/celestiaorg/celestia-app/v2/app/encoding"
 	"github.com/celestiaorg/celestia-app/v2/pkg/appconsts"
 	"github.com/celestiaorg/celestia-app/v2/test/util/genesis"
+	blobtypes "github.com/celestiaorg/celestia-app/v2/x/blob/types"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
@@ -46,7 +47,18 @@ type Network struct {
 
 func NewNetwork(chainID string) (*Network, error) {
 	codec := encoding.MakeConfig(app.ModuleEncodingRegisters...)
-	g := genesis.NewDefaultGenesis().WithChainID(chainID).WithModifiers(genesis.ImmediateProposals(codec.Codec))
+	blobParams := blobtypes.DefaultParams()
+	blobParams.GovMaxSquareSize = uint64(appconsts.SquareSizeUpperBound(2))
+	cparams := app.DefaultConsensusParams()
+	cparams.Block.MaxBytes = 10_000_000
+
+	g := genesis.NewDefaultGenesis().
+		WithChainID(chainID).
+		WithModifiers(
+			genesis.ImmediateProposals(codec.Codec),
+			genesis.SetBlobParams(codec.Codec, blobParams),
+		).
+		WithConsensusParams(cparams)
 
 	return &Network{
 		genesis:    g,
