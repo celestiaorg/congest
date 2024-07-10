@@ -1,13 +1,36 @@
 #!/bin/bash
 
 SSH_KEY="~/.ssh/id_rsa"
+TIMEOUT=120
 
 # Fetch the IP addresses from Pulumi stack outputs
 STACK_OUTPUT=$(pulumi stack output -j)
 DROPLET_IPS=$(echo "$STACK_OUTPUT" | jq -r '.[]')
 
+# Function to boot a node
+boot_node() {
+  local IP=$1
+  {
+    echo "Booting $IP -----------------------------------------------------"
+    ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$IP" \
+    "tmux new -d -s init_install 'source /root/payload/init_install.sh'"
+    echo "Boot complete for $IP"
+  } &
+
+  PID=$!
+  (sleep $TIMEOUT && kill -HUP $PID) 2>/dev/null &
+
+  if wait $PID 2>/dev/null; then
+    echo "$IP: Boot finished within timeout"
+  else
+    echo "$IP: Boot operation timed out"
+  fi
+}
+
+# Loop through the IPs and run the boot command in parallel
 for IP in $DROPLET_IPS; do
-  echo "booting $IP -----------------------------------------------------"
-  ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$IP" \
-  "tmux new -d -s init_install 'source /root/payload/init_install.sh'"
+  boot_node "$IP" &
 done
+
+# Wait for all background processes to finish
+wait
