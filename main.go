@@ -1,37 +1,36 @@
 package main
 
 import (
-	"congest/cmd/netgen"
+	"congest/network"
 	"fmt"
 	"log"
 	"path/filepath"
-	"sync"
-	"time"
 
-	"github.com/pulumi/pulumi-digitalocean/sdk/v4/go/digitalocean"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
+	pcfg "github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
+)
+
+const (
+	// TestConfigKey is the key used to retrieve which test is being ran from
+	// the pulumi config. This value can be set by running `pulumi config set test TestName`
+	TestConfigKey = "test"
+
+	// RegionsConfgKey is the key used to retrieve the regions that the network
+	// should be deployed to from the pulumi config. This value can be set by
+	// running `pulumi config set regions Full`.
+	RegionsConfgKey = "regions"
+
+	// ChainIDConfigKey is the key used to retrieve the chain ID that the network
+	// should be deployed with from the pulumi config. This value can be set by
+	// running `pulumi config set chainID ChainID`.
+	ChainIDConfigKey = "chainID"
+
+	// GlobalTimeout is passed to all pulumi resources to ensure that they do
+	// not stay alive too long.
+	GlobalTimeoutString = "30m"
 )
 
 var (
-	Regions = map[string]int{
-		"nyc1": 3, "nyc3": 3, "sfo2": 3, "sfo3": 3, "ams3": 6, "sgp1": 7, "lon1": 4, "fra1": 3, "tor1": 3,
-		"blr1": 7, "syd1": 7,
-	}
-
-	ReducedRegions = map[string]int{
-		"nyc1": 1, "nyc3": 2, "sfo2": 2, "sfo3": 1, "ams3": 2, "sgp1": 3, "lon1": 2, "fra1": 2, "tor1": 2,
-		"blr1": 2, "syd1": 2,
-	}
-
-	MinimalRegions = map[string]int{
-		"nyc3": 1, "sfo3": 1, "ams3": 1, "sgp1": 1, "lon1": 1, "tor1": 1,
-		"blr1": 1, "syd1": 1,
-	}
-
-	TestRegions = map[string]int{
-		"sfo3": 1, "sgp1": 1,
-	}
-
 	sshIDs = []string{"31257644", "38506026", "32322687", "31138666", "22444021"}
 
 	ChainID = "congest"
@@ -41,50 +40,30 @@ func main() {
 	payloadRoot := "./payload"
 
 	// Call the function to generate the network with the provided arguments
-	n, err := netgen.NewNetwork(ChainID)
+	n, err := network.NewNetwork(ChainID)
 	if err != nil {
 		panic(err)
 	}
 
-	wg := &sync.WaitGroup{}
-
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cursor := 0
 
-		for region, count := range Regions {
-			for j := 0; j < count; j++ {
-				vname := fmt.Sprintf("validator-%d", cursor)
-				ctx.Log.Info(fmt.Sprintf("Creating droplet %s in region %s", vname, region), nil)
-				droplet, err := digitalocean.NewDroplet(ctx, vname, &digitalocean.DropletArgs{
-					Region:  pulumi.String(region),
-					Size:    pulumi.String("s-8vcpu-16gb"),     // Replace with the desired droplet size slug
-					Image:   pulumi.String("ubuntu-22-04-x64"), // Replace with the desired image slug
-					Name:    pulumi.String(vname),
-					SshKeys: pulumi.ToStringArray(sshIDs),
-				})
-				if err != nil {
-					ctx.Export("vname", pulumi.String(fmt.Sprintf("Error creating droplet %s %s: %s", vname, region, err.Error())))
-					continue
-				} else {
-					ctx.Export(vname, droplet.Ipv4Address)
-				}
-
-				wg.Add(1)
-				droplet.Ipv4Address.ApplyT(func(ip string) string {
-					defer wg.Done()
-					err = n.AddValidator(vname, ip, payloadRoot, region)
-					if err != nil {
-						panic(err)
-					}
-
-					return ip
-				})
-
-				cursor++
-			}
+		test := pcfg.Get(ctx, TestConfigKey)
+		if test == "" {
+			return fmt.Errorf("No test configuration provided, please assign a test configuration to the 'test' key in the Pulumi config with ")
 		}
-		go func() {
-			wg.Wait()
+
+		do := NewDigitalOcean(sshIDs, GlobalTimeoutString)
+		var validators []network.NodeInfo
+		DOVals, cursor := DeployValidators(ctx, do, TestRegions.DO, cursor)
+		validators = append(validators, DOVals...)
+
+		ips := make([]pulumi.StringOutput, 0, len(validators))
+		for _, val := range DOVals {
+			n.AsyncAddValidator(val.Name, val.Region, payloadRoot, val.PendingIP)
+			ips = append(ips, val.PendingIP)
+		}
+		pulumi.All(ips).ApplyT(func(_ []interface{}) error {
 			err = n.InitNodes(payloadRoot)
 			if err != nil {
 				log.Fatal(err)
@@ -97,9 +76,24 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-		}()
+			return nil
+		})
 		return nil
 	})
-	time.Sleep(10 * time.Second)
 
 }
+
+// Improvemnents - we can make better use of the apply txs I think by first
+// doing all of the things that we can do then and there, then we wait to do all
+// the sync stuff (like genesis creatiqon) there.
+
+// We likely need to add multiple clounds
+
+// we likely need to add things so that users can run specific tests instead of
+// only being able to call pulumi up. I'd prefer just using go instead of config
+// files for this as the mental overhead feels like less.
+
+// as a random note: we need to get a mechanism that adds the ssh key to each of
+// the nodes. With multiple clouds, I could see this being a bit of an issue.
+// Perhaps this is where we use ansible? we jus ou ssh kay to on each node, and
+// then we

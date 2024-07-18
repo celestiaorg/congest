@@ -10,6 +10,10 @@ STACK_OUTPUT=$(pulumi stack output -j)
 echo $STACK_OUTPUT
 DROPLET_IPS=$(echo "$STACK_OUTPUT" | jq -r '.[]')
 
+cp ./scripts/init_install.sh ./payload/init_install.sh
+cp ./scripts/txsim.sh ./payload/txsim.sh
+cp ./scripts/boot_network.sh ./payload/boot_network.sh
+
 # Compress the directory
 echo "Compressing the directory $DIRECTORY_TO_TRANSFER..."
 tar -czf "$ARCHIVE_NAME" -C "$(dirname "$DIRECTORY_TO_TRANSFER")" "$(basename "$DIRECTORY_TO_TRANSFER")"
@@ -17,7 +21,7 @@ tar -czf "$ARCHIVE_NAME" -C "$(dirname "$DIRECTORY_TO_TRANSFER")" "$(basename "$
 # Function to transfer and uncompress files on the remote server
 transfer_and_uncompress() {
   local IP=$1
-  echo "Transferring files to $IP -----------------------------------------------------"
+  echo "Transferring files to $IP -----------------------"
   scp -i "$SSH_KEY" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$ARCHIVE_NAME" "root@$IP:/root/"
 
   # Uncompress the directory on the remote node

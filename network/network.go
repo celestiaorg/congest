@@ -1,4 +1,4 @@
-package netgen
+package network
 
 import (
 	"encoding/json"
@@ -15,6 +15,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
+	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/tendermint/tendermint/config"
 	cmtjson "github.com/tendermint/tendermint/libs/json"
 	cmtos "github.com/tendermint/tendermint/libs/os"
@@ -30,6 +31,7 @@ type NodeInfo struct {
 	IP             string `json:"ip"`
 	NetworkAddress string `json:"network_address"`
 	Region         string `json:"region"`
+	PendingIP      pulumi.StringOutput
 }
 
 func (n NodeInfo) PeerID() string {
@@ -66,6 +68,15 @@ func NewNetwork(chainID string) (*Network, error) {
 		validators: make(map[string]NodeInfo),
 		ecfg:       codec,
 	}, nil
+}
+
+// AsyncAddValidator will add the validator to the network after the IP address
+// for the node instance is available.
+func (n *Network) AsyncAddValidator(name, region, payloadRoot string, ip pulumi.StringOutput) {
+	ip.ApplyT(func(ip string) error {
+		n.AddValidator(name, ip, payloadRoot, region)
+		return nil
+	})
 }
 
 // AddValidator adds a validator to the network. The validator is identified by
