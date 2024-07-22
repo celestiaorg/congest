@@ -4,7 +4,10 @@ import (
 	"congest/network"
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	pcfg "github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
@@ -48,14 +51,29 @@ func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cursor := 0
 
-		test := pcfg.Get(ctx, TestConfigKey)
+		cfg := pcfg.New(ctx, "")
+
+		test := cfg.Get(TestConfigKey)
 		if test == "" {
 			return fmt.Errorf("No test configuration provided, please assign a test configuration to the 'test' key in the Pulumi config with ")
 		}
 
+		fmt.Println("test found", test)
+		experiment, has := GetExperiment(test)
+		if !has {
+			return fmt.Errorf("No experiment found for test %s", test)
+		}
+
+		rawSSHIDs := os.Getenv("DO_SSH_IDS")
+
+		sshIDs := strings.Split(rawSSHIDs, " ")
+		if len(sshIDs) == 0 {
+			return fmt.Errorf("No SSH IDs provided, please provide a list of SSH IDs in the DO_SSH_IDS environment variable")
+		}
+
 		do := NewDigitalOcean(sshIDs, GlobalTimeoutString)
 		var validators []network.NodeInfo
-		DOVals, cursor := DeployValidators(ctx, do, TestRegions.DO, cursor)
+		DOVals, cursor := DeployValidators(ctx, do, experiment.Regions, cursor)
 		validators = append(validators, DOVals...)
 
 		ips := make([]pulumi.StringOutput, 0, len(validators))
@@ -63,23 +81,30 @@ func main() {
 			n.AsyncAddValidator(val.Name, val.Region, payloadRoot, val.PendingIP)
 			ips = append(ips, val.PendingIP)
 		}
+
 		pulumi.All(ips).ApplyT(func(_ []interface{}) error {
-			err = n.InitNodes(payloadRoot)
+			err = n.InitNodes(test, payloadRoot)
 			if err != nil {
 				log.Fatal(err)
 			}
-			err = n.SaveValidatorsToFile(filepath.Join(payloadRoot, "validators.json"))
-			if err != nil {
-				log.Fatal(err)
-			}
+
 			err = n.SaveAddressBook(payloadRoot, n.Peers())
 			if err != nil {
 				log.Fatal(err)
 			}
+
+			err = n.SaveValidatorsToFile(filepath.Join(payloadRoot, "validators.json"))
+			if err != nil {
+				log.Fatal(err)
+			}
+
 			return nil
 		})
+
 		return nil
 	})
+
+	time.Sleep(40 * time.Second)
 
 }
 

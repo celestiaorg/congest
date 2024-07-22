@@ -91,4 +91,7 @@ mv payload/$parsed_hostname/config.toml $HOME/$CELES_HOME/config/config.toml
 
 cp -r payload/$parsed_hostname/keyring-test $HOME/$CELES_HOME
 
+# run txsim script which starts a sleep timer and txsim in a different tmux session
+source payload/txsim.sh
+
 celestia-appd start

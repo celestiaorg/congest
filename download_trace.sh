@@ -10,8 +10,12 @@ fi
 NAME="$1"
 FILE_TYPE="$2"
 
-# Define the SSH key (you might need to set this or modify as needed)
-SSH_KEY="~/.ssh/id_rsa"
+# Set default SSH key location
+DEFAULT_SSH_KEY="~/.ssh/id_rsa"
+
+# Allow user to override the SSH key location
+SSH_KEY=${SSH_KEY:-$DEFAULT_SSH_KEY}
+
 
 # Fetch the IP addresses from Pulumi stack outputs and store in a JSON file
 pulumi stack output -j > ./payload/ips.json

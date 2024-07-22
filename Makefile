@@ -1,7 +1,18 @@
-.PHONY: up down
+.PHONY: deploy destroy test
 
-up:
-	pulumi up --yes && source send_payload.sh && source boot_network.sh
+deploy:
+	set -e; \
+	pulumi up --yes && \
+	bash send_payload.sh && \
+	bash boot_network.sh
 
-down:
+destroy:
 	pulumi down --yes
+	bash clean.sh
+
+test:
+	pulumi config set test $(word 2,$(MAKECMDGOALS))
+	$(MAKE) deploy
+
+%:
+	@:

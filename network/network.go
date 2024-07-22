@@ -138,7 +138,7 @@ func (n *Network) AddAccount(name string) {
 	n.accounts = append(n.accounts, name)
 }
 
-func (n *Network) InitNodes(rootDir string) error {
+func (n *Network) InitNodes(test, rootDir string) error {
 	if len(n.accounts) != 0 {
 		n.genesis.WithKeyringAccounts(genesis.NewKeyringAccounts(genesis.DefaultInitialBalance, n.accounts...)...)
 	}

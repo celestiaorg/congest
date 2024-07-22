@@ -2,7 +2,10 @@
 
 DIRECTORY_TO_TRANSFER="./payload"
 ARCHIVE_NAME="payload.tar.gz"
-SSH_KEY="~/.ssh/id_rsa"
+# Set default SSH key location
+DEFAULT_SSH_KEY="~/.ssh/id_rsa"
+# Allow user to override the SSH key location
+SSH_KEY=${SSH_KEY:-$DEFAULT_SSH_KEY}
 
 # Fetch the IP addresses from Pulumi stack outputs
 pulumi stack output -j > ./payload/ips.json

@@ -1,6 +1,13 @@
 #!/bin/bash
 
-SSH_KEY="~/.ssh/id_rsa"
+# Set default SSH key location
+DEFAULT_SSH_KEY="~/.ssh/id_rsa"
+
+# Allow user to override the SSH key location
+SSH_KEY=${SSH_KEY:-$DEFAULT_SSH_KEY}
+
+
+# Rest of your script goes here
 TIMEOUT=120
 
 # Fetch the IP addresses from Pulumi stack outputs
