@@ -4,6 +4,9 @@ CELES_HOME=".celestia-app"
 MONIKER="validator"
 ARCHIVE_NAME="payload.tar.gz"
 
+ufw allow 26657/tcp
+ufw allow 26656/tcp
+
 # Ensure the script is run as root
 if [ "$(id -u)" -ne 0 ]; then
   echo "This script must be run as root. Please run with sudo or as root."
@@ -26,6 +29,16 @@ fi
 echo "Updating sysctl settings..."
 sysctl -w net.core.default_qdisc=fq
 sysctl -w net.ipv4.tcp_congestion_control=bbr
+
+# Enable MPTCP
+sysctl -w net.mptcp.enabled=1
+
+# Set the path manager to ndiffports
+sysctl -w net.mptcp.mptcp_path_manager=ndiffports
+
+# Specify the number of subflows
+SUBFLOWS=4
+sysctl -w net.mptcp.mptcp_ndiffports=$SUBFLOWS
 
 # Make the changes persistent across reboots
 echo "Making changes persistent..."

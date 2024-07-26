@@ -18,7 +18,7 @@ type Provider interface {
 // created. The function returns a map of the validator names to their IP
 // addresses and the new cursor.
 func DeployValidators(ctx *pulumi.Context, p Provider, regions map[string]int, cursor int) ([]network.NodeInfo, int) {
-	validators := make([]network.NodeInfo, 0)
+	validators := []network.NodeInfo{}
 	for region, count := range regions {
 		for j := 0; j < count; j++ {
 			vname := fmt.Sprintf("validator-%d", cursor)

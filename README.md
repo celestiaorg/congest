@@ -32,23 +32,28 @@ so that any cosmos chain dev could run their own hyper realistic network tests.
 
 1) Setup and install [pulumi](https://www.pulumi.com/docs/install/)
 2) Get a digitalocean token and set it as an environment variable `DIGITALOCEAN_TOKEN`
-3) Make sure this token has enough permissions to spin up 100 droplets.
-4) Add your ssh key to digitalocean, and set the `SSH_KEY_DO_ID` environment
-   variable so that we can tell digitalocean to add that public key to all
-   droplets we spin up.
+3) Get a vultr token and set it as an environment variable `VULTR_TOKEN`
+4) Make sure this token has enough permissions to up enough instances.
+5) Add your ssh key to digitalocean and vultr, and set the `DO_SSH_KEY_IDS` and
+   `VULTR_SSH_KEY_IDS environment variable so that we can tell digitalocean to
+   add that public key to all droplets we spin up.
 
    ```sh
    doctl compute ssh-key list
    ```
 
-5) Run `make test <TestName>` to run a test.
+   ```sh
+   vultr-cli ssh-key list
+   ```
 
-After setting pulumi and the `DIGITALOCEAN_TOKEN` env var, you can run the
+6) Run `make deploy <TestName> <ChainID>` to run a test.
+
+After setting pulumi and the all four of the env vars, you can run the
 following commands to deploy the infrastructure (there can be limits set on the
-number of droplets one account can deploy, be sure to set those high enough):
+number of virtual machines one account can deploy, be sure to set those high enough):
 
 ```sh
-make test Test100Nodes8MB
+make deploy Test100Nodes8MB tcp-congestion-1
 ```
 
 This test will then proceed to configure and spin up 100 geographically
@@ -72,7 +77,7 @@ The tests *should* destroy themselves after 30 minutes, however its safest to
 check up on this or by manually calling
 
 ```sh
-make destroy
+make down
 ```
 
 which will ask pulumi to destroy all the nodes. If configured properly and if

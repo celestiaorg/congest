@@ -2,15 +2,11 @@ package main
 
 import (
 	"congest/network"
-	"fmt"
 	"log"
-	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
-	pcfg "github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
 
 const (
@@ -33,55 +29,50 @@ const (
 	GlobalTimeoutString = "30m"
 )
 
-var (
-	ChainID = "congest"
-)
-
 func main() {
 	payloadRoot := "./payload"
 
-	// Call the function to generate the network with the provided arguments
-	n, err := network.NewNetwork(ChainID)
+	experiment, chainID, err := readEnv()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
+	}
+
+	// Call the function to generate the network with the provided arguments
+	n, err := network.NewNetwork(chainID)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		cursor := 0
 
-		cfg := pcfg.New(ctx, "")
-
-		test := cfg.Get(TestConfigKey)
-		if test == "" {
-			return fmt.Errorf("No test configuration provided, please assign a test configuration to the 'test' key in the Pulumi config with ")
+		do, err := NewDigitalOcean(GlobalTimeoutString)
+		if err != nil {
+			log.Fatal(err)
 		}
 
-		fmt.Println("test found", test)
-		experiment, has := GetExperiment(test)
-		if !has {
-			return fmt.Errorf("No experiment found for test %s", test)
+		vultr, err := NewVultr(GlobalTimeoutString)
+		if err != nil {
+			log.Fatal(err)
 		}
 
-		rawSSHIDs := os.Getenv("DO_SSH_IDS")
-
-		sshIDs := strings.Split(rawSSHIDs, " ")
-		if len(sshIDs) == 0 {
-			return fmt.Errorf("No SSH IDs provided, please provide a list of SSH IDs in the DO_SSH_IDS environment variable")
-		}
-
-		do := NewDigitalOcean(sshIDs, GlobalTimeoutString)
 		var validators []network.NodeInfo
-		DOVals, cursor := DeployValidators(ctx, do, experiment.Regions, sshIDs, cursor)
+
+		DOVals, cursor := DeployValidators(ctx, do, experiment.Regions.DigitalOcean, cursor)
 		validators = append(validators, DOVals...)
 
+		vultrVals, cursor := DeployValidators(ctx, vultr, experiment.Regions.Vultr, cursor)
+		validators = append(validators, vultrVals...)
+
 		ips := make([]pulumi.StringOutput, 0, len(validators))
-		for _, val := range DOVals {
+
+		for _, val := range validators {
 			n.AsyncAddValidator(val.Name, val.Region, payloadRoot, val.PendingIP)
 			ips = append(ips, val.PendingIP)
 		}
 
 		pulumi.All(ips).ApplyT(func(_ []interface{}) error {
-			err = n.InitNodes(test, payloadRoot)
+			err = n.InitNodes(payloadRoot)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -102,21 +93,6 @@ func main() {
 		return nil
 	})
 
-	time.Sleep(40 * time.Second)
-
+	// Sleep for 30 seconds to allow for the instance to be accessible
+	time.Sleep(30 * time.Second)
 }
-
-// Improvemnents - we can make better use of the apply txs I think by first
-// doing all of the things that we can do then and there, then we wait to do all
-// the sync stuff (like genesis creatiqon) there.
-
-// We likely need to add multiple clounds
-
-// we likely need to add things so that users can run specific tests instead of
-// only being able to call pulumi up. I'd prefer just using go instead of config
-// files for this as the mental overhead feels like less.
-
-// as a random note: we need to get a mechanism that adds the ssh key to each of
-// the nodes. With multiple clouds, I could see this being a bit of an issue.
-// Perhaps this is where we use ansible? we jus ou ssh kay to on each node, and
-// then we

@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/pulumi/pulumi-digitalocean/sdk/v4/go/digitalocean"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
@@ -17,13 +19,25 @@ type DigitalOcean struct {
 // NewDigitalOcean creates a new DigitalOcean provider with the given SSH IDs
 // and timeout. The timeout should take the form of a string that can be parsed
 // by pulumi, so "30m" would be 30 minutes, "1h" would be 1 hour, etc.
-func NewDigitalOcean(sshIDs []string, timeout string) *DigitalOcean {
+func NewDigitalOcean(timeout string) (*DigitalOcean, error) {
+	rawDOSshIDs := os.Getenv("DO_SSH_KEY_IDS")
+	if rawDOSshIDs == "" {
+		fmt.Println("no raw ssh key")
+		return nil, fmt.Errorf("No SSH IDs provided, please provide a list of SSH IDs in the DO_SSH_IDS environment variable")
+	}
+
+	sshIDs := strings.Split(rawDOSshIDs, ",")
+	if len(sshIDs) == 0 {
+		fmt.Println("no shh keys from parsing")
+		return nil, fmt.Errorf("No SSH IDs provided, please provide a list of SSH IDs in the DO_SSH_IDS environment variable")
+	}
+
 	return &DigitalOcean{
 		sshIDs: sshIDs,
 		globalTimeout: pulumi.CustomTimeouts{
 			Delete: timeout,
 		},
-	}
+	}, nil
 }
 
 // CreateValidatorInstance creates a new validator instance in the given region.
@@ -35,7 +49,7 @@ func (d *DigitalOcean) CreateValidatorInstance(ctx *pulumi.Context, name, region
 		Size:    pulumi.String("s-8vcpu-16gb"),     // Replace with the desired droplet size slug
 		Image:   pulumi.String("ubuntu-22-04-x64"), // Replace with the desired image slug
 		Name:    pulumi.String(name),
-		SshKeys: pulumi.ToStringArray(sshIDs),
+		SshKeys: pulumi.ToStringArray(d.sshIDs),
 	}, pulumi.Timeouts(&d.globalTimeout))
 	if err != nil {
 		ctx.Export("name", pulumi.String(fmt.Sprintf("Error creating droplet %s %s: %s", name, region, err.Error())))
@@ -69,27 +83,5 @@ var (
 
 	DOTestRegions = map[string]int{
 		"sfo3": 1, "sgp1": 1,
-	}
-)
-
-var (
-	FullRegions = Regions{
-		DO: DOFullRegions,
-	}
-
-	HalfRegions = Regions{
-		DO: DOHalfRegions,
-	}
-
-	ReducedRegions = Regions{
-		DO: DOReducedRegions,
-	}
-
-	MinimalRegions = Regions{
-		DO: DOMinimalRegions,
-	}
-
-	TestRegions = Regions{
-		DO: DOTestRegions,
 	}
 )

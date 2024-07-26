@@ -27,11 +27,11 @@ import (
 // NodeInfo is a struct that contains the name, IP address, and network address
 // of a node.
 type NodeInfo struct {
-	Name           string `json:"name"`
-	IP             string `json:"ip"`
-	NetworkAddress string `json:"network_address"`
-	Region         string `json:"region"`
-	PendingIP      pulumi.StringOutput
+	Name           string              `json:"name"`
+	IP             string              `json:"ip"`
+	NetworkAddress string              `json:"network_address"`
+	Region         string              `json:"region"`
+	PendingIP      pulumi.StringOutput `json:"-"`
 }
 
 func (n NodeInfo) PeerID() string {
@@ -138,7 +138,7 @@ func (n *Network) AddAccount(name string) {
 	n.accounts = append(n.accounts, name)
 }
 
-func (n *Network) InitNodes(test, rootDir string) error {
+func (n *Network) InitNodes(rootDir string) error {
 	if len(n.accounts) != 0 {
 		n.genesis.WithKeyringAccounts(genesis.NewKeyringAccounts(genesis.DefaultInitialBalance, n.accounts...)...)
 	}
@@ -260,6 +260,7 @@ func MakeConfig(name string, opts ...Option) (*config.Config, error) {
 	cfg.RPC.MaxOpenConnections = 1000
 	cfg.RPC.TimeoutBroadcastTxCommit = 60 * time.Second
 	cfg.RPC.MaxSubscriptionClients = 1000
+	cfg.RPC.ListenAddress = "tcp://0.0.0.0:26657"
 	cfg.Consensus.TimeoutPropose = time.Second * 10
 	cfg.Consensus.TimeoutCommit = time.Second * 11
 	cfg.Consensus.OnlyInternalWal = true

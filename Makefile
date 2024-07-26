@@ -1,18 +1,19 @@
-.PHONY: deploy destroy test
+.PHONY: up down test
 
-deploy:
+up:
 	set -e; \
 	pulumi up --yes && \
-	bash send_payload.sh && \
-	bash boot_network.sh
+	. ./send_payload.sh && \
+	. ./boot_network.sh && \
+	. ./start_txsim.sh
 
-destroy:
+down:
 	pulumi down --yes
-	bash clean.sh
+	. ./scripts/clean.sh
 
-test:
-	pulumi config set test $(word 2,$(MAKECMDGOALS))
-	$(MAKE) deploy
+deploy:
+	$(MAKE) EXPERIMENT_NAME=$(word 2,$(MAKECMDGOALS)) EXPERIMENT_CHAIN_ID=$(word 3,$(MAKECMDGOALS)) up
+
 
 %:
 	@:
