@@ -34,8 +34,6 @@ const (
 )
 
 var (
-	sshIDs = []string{"31257644", "38506026", "32322687", "31138666", "22444021"}
-
 	ChainID = "congest"
 )
 
@@ -73,7 +71,7 @@ func main() {
 
 		do := NewDigitalOcean(sshIDs, GlobalTimeoutString)
 		var validators []network.NodeInfo
-		DOVals, cursor := DeployValidators(ctx, do, experiment.Regions, cursor)
+		DOVals, cursor := DeployValidators(ctx, do, experiment.Regions, sshIDs, cursor)
 		validators = append(validators, DOVals...)
 
 		ips := make([]pulumi.StringOutput, 0, len(validators))
