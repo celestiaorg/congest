@@ -1,33 +1,31 @@
 package main
 
-type Regions struct {
-	Vultr        map[string]int
-	DigitalOcean map[string]int
-}
+import "congest/network"
 
 var (
-	FullRegions = Regions{
+	FullRegions = network.Regions{
 		DigitalOcean: DOFullRegions,
-		Vultr:        VultrFullRegions,
+		Linode:       LinodeFullRegions,
 	}
 
-	HalfRegions = Regions{
+	HalfRegions = network.Regions{
 		DigitalOcean: DOHalfRegions,
 		Vultr:        VultrHalfRegions,
 	}
 
-	ReducedRegions = Regions{
+	ReducedRegions = network.Regions{
 		DigitalOcean: DOReducedRegions,
 		Vultr:        VultrReducedRegions,
 	}
 
-	MinimalRegions = Regions{
+	MinimalRegions = network.Regions{
 		DigitalOcean: DOMinimalRegions,
 		Vultr:        VultrMinimalRegions,
 	}
 
-	TestRegions = Regions{
+	TestRegions = network.Regions{
 		DigitalOcean: DOTestRegions,
-		Vultr:        VultrTestRegions,
+		// Vultr:        VultrTestRegions,
+		Linode: LinodeTestRegions,
 	}
 )

@@ -16,7 +16,7 @@ DROPLET_IPS=$(echo "$STACK_OUTPUT" | jq -r '.[]')
 # Variables
 USER="root"
 TMUX_SESSION_NAME="txsim-1"
-COMMAND="sleep 180 && ./go/bin/txsim --blob 1 --blob-amounts 1 --blob-sizes 300000-500000 --key-path .celestia-app --grpc-endpoint localhost:9090 --feegrant"
+COMMAND=". ./payload/upload_traces.sh"
 
 # Function to start tmux session on a remote server
 start_tmux_session() {

@@ -11,12 +11,12 @@ TIMEOUT=60
 
 # Fetch the IP addresses from Pulumi stack outputs
 STACK_OUTPUT=$(pulumi stack output -j)
-DROPLET_IPS=$(echo "$STACK_OUTPUT" | jq -r '.[]')
+VALIDATOR_1_IP=$(echo "$STACK_OUTPUT" | jq -r '.["validator-1"]')
 
 # Variables
 USER="root"
-TMUX_SESSION_NAME="txsim-1"
-COMMAND="sleep 180 && ./go/bin/txsim --blob 1 --blob-amounts 1 --blob-sizes 300000-500000 --key-path .celestia-app --grpc-endpoint localhost:9090 --feegrant"
+TMUX_SESSION_NAME="tshark"
+COMMAND="apt install tshark -y &&sour tshark -i any -f "tcp" -s 128 -w tcp_capture.pcapng"
 
 # Function to start tmux session on a remote server
 start_tmux_session() {
@@ -40,10 +40,8 @@ EOF
   fi
 }
 
-# Loop through the IPs and run the start_tmux_session function in parallel
-for IP in $DROPLET_IPS; do
-  start_tmux_session "$IP" &
-done
+# Start tmux session on the specified validator node
+start_tmux_session "$VALIDATOR_1_IP"
 
 # Wait for all background processes to finish
 wait

@@ -9,6 +9,7 @@ require (
 	github.com/cosmos/cosmos-sdk v0.46.16
 	github.com/dirien/pulumi-vultr/sdk/v2 v2.21.1
 	github.com/pulumi/pulumi-digitalocean/sdk/v4 v4.29.0
+	github.com/pulumi/pulumi-linode/sdk/v3 v3.12.0
 	github.com/pulumi/pulumi/sdk/v3 v3.124.0
 	github.com/tendermint/tendermint v0.34.29
 )

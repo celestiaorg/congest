@@ -17,6 +17,7 @@ import (
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/tendermint/tendermint/config"
+	cmtcfg "github.com/tendermint/tendermint/config"
 	cmtjson "github.com/tendermint/tendermint/libs/json"
 	cmtos "github.com/tendermint/tendermint/libs/os"
 	"github.com/tendermint/tendermint/p2p"
@@ -41,8 +42,9 @@ func (n NodeInfo) PeerID() string {
 // Network maintains the initial state of the network. This includes the
 // genesis, all relevant validators included in the genesis, and all accounts.
 type Network struct {
-	genesis *genesis.Genesis
-	ecfg    encoding.Config
+	experiment Experiment
+	genesis    *genesis.Genesis
+	ecfg       encoding.Config
 
 	validators map[string]NodeInfo
 	accounts   []string
@@ -51,9 +53,9 @@ type Network struct {
 func NewNetwork(chainID string) (*Network, error) {
 	codec := encoding.MakeConfig(app.ModuleEncodingRegisters...)
 	blobParams := blobtypes.DefaultParams()
-	blobParams.GovMaxSquareSize = uint64(appconsts.SquareSizeUpperBound(2))
+	blobParams.GovMaxSquareSize = 64
 	cparams := app.DefaultConsensusParams()
-	cparams.Block.MaxBytes = 10_000_000
+	cparams.Block.MaxBytes = 2_500_000
 
 	g := genesis.NewDefaultGenesis().
 		WithChainID(chainID).
@@ -74,6 +76,9 @@ func NewNetwork(chainID string) (*Network, error) {
 // for the node instance is available.
 func (n *Network) AsyncAddValidator(name, region, payloadRoot string, ip pulumi.StringOutput) {
 	ip.ApplyT(func(ip string) error {
+		if ip == "" {
+			return nil
+		}
 		n.AddValidator(name, ip, payloadRoot, region)
 		return nil
 	})
@@ -128,6 +133,9 @@ func (n *Network) AddValidator(name, ip, payLoadRoot, region string) error {
 func (n *Network) Peers() []string {
 	var peers []string
 	for _, v := range n.validators {
+		if v.IP == "" {
+			continue
+		}
 		peers = append(peers, v.PeerID())
 	}
 	return peers
@@ -261,8 +269,8 @@ func MakeConfig(name string, opts ...Option) (*config.Config, error) {
 	cfg.RPC.TimeoutBroadcastTxCommit = 60 * time.Second
 	cfg.RPC.MaxSubscriptionClients = 1000
 	cfg.RPC.ListenAddress = "tcp://0.0.0.0:26657"
-	cfg.Consensus.TimeoutPropose = time.Second * 10
-	cfg.Consensus.TimeoutCommit = time.Second * 11
+	cfg.Consensus.TimeoutPropose = time.Second * 3
+	cfg.Consensus.TimeoutCommit = time.Millisecond * 4200
 	cfg.Consensus.OnlyInternalWal = true
 	cfg.Instrumentation.TraceBufferSize = 5000
 	cfg.Instrumentation.TraceType = "local"
@@ -308,6 +316,19 @@ func WriteAddressBook(peers []string, file string) error {
 	}
 	book.Save()
 	return nil
+}
+
+type Regions struct {
+	Vultr        map[string]int
+	DigitalOcean map[string]int
+	Linode       map[string]int
+}
+
+type ConfigOption func(*cmtcfg.Config)
+
+type Experiment struct {
+	CfgOptions []ConfigOption
+	Regions    Regions
 }
 
 // func addPeersToAddressBook(path string, peers []PeerPacket) error {

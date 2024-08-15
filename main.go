@@ -51,7 +51,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		vultr, err := NewVultr(GlobalTimeoutString)
+		linode, err := NewLinodeProvider(GlobalTimeoutString)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -61,8 +61,8 @@ func main() {
 		DOVals, cursor := DeployValidators(ctx, do, experiment.Regions.DigitalOcean, cursor)
 		validators = append(validators, DOVals...)
 
-		vultrVals, cursor := DeployValidators(ctx, vultr, experiment.Regions.Vultr, cursor)
-		validators = append(validators, vultrVals...)
+		linodeVals, cursor := DeployValidators(ctx, linode, experiment.Regions.Linode, cursor)
+		validators = append(validators, linodeVals...)
 
 		ips := make([]pulumi.StringOutput, 0, len(validators))
 

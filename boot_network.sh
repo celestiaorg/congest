@@ -20,7 +20,7 @@ boot_node() {
   {
     echo "Booting $IP -----------------------------------------------------"
     ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$IP" \
-    "tmux new -d -s init_install 'source /root/payload/init_install.sh'"
+    "tmux new -d -s app 'source /root/payload/init_install.sh'"
     echo "Boot complete for $IP"
   } &
 

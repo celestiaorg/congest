@@ -4,6 +4,11 @@ CELES_HOME=".celestia-app"
 MONIKER="validator"
 ARCHIVE_NAME="payload.tar.gz"
 
+  export DEBIAN_FRONTEND=noninteractive
+
+  sudo apt update -y
+  sudo apt install git build-essential ufw curl jq snapd --yes
+
 ufw allow 26657/tcp
 ufw allow 26656/tcp
 
@@ -37,7 +42,7 @@ sysctl -w net.mptcp.enabled=1
 sysctl -w net.mptcp.mptcp_path_manager=ndiffports
 
 # Specify the number of subflows
-SUBFLOWS=4
+SUBFLOWS=32
 sysctl -w net.mptcp.mptcp_ndiffports=$SUBFLOWS
 
 # Make the changes persistent across reboots
@@ -59,8 +64,6 @@ echo "Script completed successfully."
 tar -xzf /root/$ARCHIVE_NAME -C /root/
 
 source ./vars.sh
-
-sudo apt install git build-essential ufw curl jq snapd --yes
 
 sudo snap install go --channel=1.22/stable --classic
 

@@ -1,23 +1,31 @@
 package main
 
 import (
+	"congest/network"
 	"fmt"
 	"os"
+	"time"
 
 	cmtconfig "github.com/tendermint/tendermint/config"
 )
 
-type ConfigOption func(*cmtconfig.Config)
-
-type Experiment struct {
-	CfgOptions []ConfigOption
-	Regions    Regions
-}
-
 var (
-	Experiments = map[string]Experiment{
+	Experiments = map[string]network.Experiment{
 		"100Nodes8MB": {
 			Regions: FullRegions,
+		},
+		"2MB6s": {
+			Regions: FullRegions,
+			CfgOptions: []network.ConfigOption{
+				func(c *cmtconfig.Config) {
+					// note!: these aren't actually used yet, but this is what they should look like imo
+					c.Consensus.TimeoutCommit = time.Second * 4
+					c.Consensus.TimeoutPropose = time.Second * 3
+				},
+			},
+		},
+		"HalfNodes8MB": {
+			Regions: HalfRegions,
 		},
 		"MinimalNodes8MB": {
 			Regions: MinimalRegions,
@@ -28,11 +36,12 @@ var (
 	}
 )
 
-func getExperiment(test string) (Experiment, bool) {
+func getExperiment(test string) (network.Experiment, bool) {
 	experiment, ok := Experiments[test]
 	return experiment, ok
 }
-func readEnv() (experiment Experiment, chainID string, err error) {
+
+func readEnv() (experiment network.Experiment, chainID string, err error) {
 	chainID = os.Getenv("EXPERIMENT_CHAIN_ID")
 	rawExperiment := os.Getenv("EXPERIMENT_NAME")
 

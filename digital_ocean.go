@@ -50,6 +50,7 @@ func (d *DigitalOcean) CreateValidatorInstance(ctx *pulumi.Context, name, region
 		Image:   pulumi.String("ubuntu-22-04-x64"), // Replace with the desired image slug
 		Name:    pulumi.String(name),
 		SshKeys: pulumi.ToStringArray(d.sshIDs),
+		Tags:    pulumi.ToStringArray([]string{"temp"}), // add a tag to make it easy to delete in the case that pulumi fails to delete the instance
 	}, pulumi.Timeouts(&d.globalTimeout))
 	if err != nil {
 		ctx.Export("name", pulumi.String(fmt.Sprintf("Error creating droplet %s %s: %s", name, region, err.Error())))
@@ -62,8 +63,8 @@ func (d *DigitalOcean) CreateValidatorInstance(ctx *pulumi.Context, name, region
 
 var (
 	DOFullRegions = map[string]int{
-		"nyc1": 4, "nyc3": 4, "tor1": 4, "sfo2": 6, "sfo3": 6, "ams3": 11, "sgp1": 13, "lon1": 7, "fra1": 5,
-		"blr1": 13, "syd1": 13,
+		"nyc3": 4, "tor1": 4, "sfo2": 4, "sfo3": 4, "ams3": 8, "sgp1": 8, "lon1": 7, "fra1": 5,
+		"blr1": 2, "syd1": 8,
 	}
 
 	DOHalfRegions = map[string]int{
@@ -82,6 +83,6 @@ var (
 	}
 
 	DOTestRegions = map[string]int{
-		"sfo3": 1, "sgp1": 1,
+		"sfo3": 1, "lon1": 1,
 	}
 )

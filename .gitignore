@@ -7,3 +7,4 @@ payload/validators.json
 payload/ips.json
 data/
 *.jsonl
+*.pcapng
