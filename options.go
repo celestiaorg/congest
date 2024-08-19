@@ -4,7 +4,6 @@ import (
 	"congest/network"
 	"fmt"
 	"os"
-	"time"
 
 	cmtconfig "github.com/tendermint/tendermint/config"
 )
@@ -19,8 +18,8 @@ var (
 			CfgOptions: []network.ConfigOption{
 				func(c *cmtconfig.Config) {
 					// note!: these aren't actually used yet, but this is what they should look like imo
-					c.Consensus.TimeoutCommit = time.Second * 4
-					c.Consensus.TimeoutPropose = time.Second * 3
+					// c.Consensus.TimeoutCommit = time.Millisecond * 2500
+					// c.Consensus.TimeoutPropose = time.Second * 5
 				},
 			},
 		},

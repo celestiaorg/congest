@@ -16,7 +16,7 @@ VALIDATOR_1_IP=$(echo "$STACK_OUTPUT" | jq -r '.["validator-1"]')
 # Variables
 USER="root"
 TMUX_SESSION_NAME="tshark"
-COMMAND="apt install tshark -y &&sour tshark -i any -f "tcp" -s 128 -w tcp_capture.pcapng"
+COMMAND="apt install tshark -y && tshark -i any -f "tcp" -s 128 -w tcp_capture.pcapng"
 
 # Function to start tmux session on a remote server
 start_tmux_session() {

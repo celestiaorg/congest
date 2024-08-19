@@ -53,9 +53,9 @@ type Network struct {
 func NewNetwork(chainID string) (*Network, error) {
 	codec := encoding.MakeConfig(app.ModuleEncodingRegisters...)
 	blobParams := blobtypes.DefaultParams()
-	blobParams.GovMaxSquareSize = 64
+	blobParams.GovMaxSquareSize = 128
 	cparams := app.DefaultConsensusParams()
-	cparams.Block.MaxBytes = 2_500_000
+	cparams.Block.MaxBytes = 10_000_000
 
 	g := genesis.NewDefaultGenesis().
 		WithChainID(chainID).
@@ -269,8 +269,8 @@ func MakeConfig(name string, opts ...Option) (*config.Config, error) {
 	cfg.RPC.TimeoutBroadcastTxCommit = 60 * time.Second
 	cfg.RPC.MaxSubscriptionClients = 1000
 	cfg.RPC.ListenAddress = "tcp://0.0.0.0:26657"
-	cfg.Consensus.TimeoutPropose = time.Second * 3
-	cfg.Consensus.TimeoutCommit = time.Millisecond * 4200
+	cfg.Consensus.TimeoutPropose = time.Second * 5
+	cfg.Consensus.TimeoutCommit = time.Millisecond * 2700
 	cfg.Consensus.OnlyInternalWal = true
 	cfg.Instrumentation.TraceBufferSize = 5000
 	cfg.Instrumentation.TraceType = "local"

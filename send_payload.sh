@@ -16,6 +16,8 @@ DROPLET_IPS=$(echo "$STACK_OUTPUT" | jq -r '.[]')
 cp ./scripts/init_install.sh ./payload/init_install.sh
 cp ./scripts/txsim.sh ./payload/txsim.sh
 cp ./scripts/vars.sh ./payload/vars.sh
+cp ./scripts/upload_traces.sh ./payload/upload_traces.sh
+
 
 # Compress the directory
 echo "Compressing the directory $DIRECTORY_TO_TRANSFER..."
