@@ -35,15 +35,11 @@ so that any cosmos chain dev could run their own hyper realistic network tests.
 3) Get a vultr token and set it as an environment variable `VULTR_TOKEN`
 4) Make sure this token has enough permissions to up enough instances.
 5) Add your ssh key to digitalocean and vultr, and set the `DO_SSH_KEY_IDS` and
-   `VULTR_SSH_KEY_IDS environment variable so that we can tell digitalocean to
-   add that public key to all droplets we spin up.
+   other clound provider's environment variable so that we can tell digitalocean
+   to add that public key to all droplets we spin up.
 
    ```sh
    doctl compute ssh-key list
-   ```
-
-   ```sh
-   vultr-cli ssh-key list
    ```
 
 6) Run `make deploy <TestName> <ChainID>` to run a test.
@@ -65,22 +61,28 @@ nodes.
 
 By default, all nodes have all the message traces enabled. These can be fetched
 via the normal mechanisms supported by the tracer (such as pushing to an s3
-bucket), however we can also call
+bucket), however, if only a single trace file is needed, we can also call
 
 ```sh
 source download_traces.sh validator-1 consensus_block.jsonl
 ```
 
+The trace collection process is triggered via the `make down` command, however
+manually triggering it is also possible by calling `source collect_traces.sh`.
+
 ### Cleaning up the test instances
 
-The tests *should* destroy themselves after 30 minutes, however its safest to
-check up on this or by manually calling
+The experiments currently do not have an automatic way to shut down the
+instances!!!! Users must call the below steps to shut down all of the instances.
 
 ```sh
 make down
 ```
 
-which will ask pulumi to destroy all the nodes. If configured properly and if
-the cloud provider's api is working then this should work. It's still a good
-idea to check the output of this command to ensure that all resources were
-properly destroyed.
+which will ask pulumi to destroy all the nodes after it starts the trace
+collection process. If configured properly and if the cloud provider's api is
+working then this should work. This command also refreshes pulumi's deployment
+after closing. It's definitely possible that some instances don't fully shut
+down, in which case `make down` should be called again. It's still a good idea
+to check the output of this command to ensure that all resources were properly
+destroyed.

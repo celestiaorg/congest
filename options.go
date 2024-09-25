@@ -10,7 +10,7 @@ import (
 
 var (
 	Experiments = map[string]network.Experiment{
-		"100Nodes8MB": {
+		"large": {
 			Regions: FullRegions,
 		},
 		"2MB6s": {
@@ -26,10 +26,10 @@ var (
 		"HalfNodes8MB": {
 			Regions: HalfRegions,
 		},
-		"MinimalNodes8MB": {
+		"minimal": {
 			Regions: MinimalRegions,
 		},
-		"Test8MB": {
+		"test": {
 			Regions: TestRegions,
 		},
 	}

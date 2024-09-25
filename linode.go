@@ -120,6 +120,22 @@ var (
 		"ap-northeast": 1,
 	}
 
+	LinodeMinimalRegions = map[string]int{
+		"ap-west":      1,
+		"ca-central":   1,
+		"ap-southeast": 1,
+		"us-sea":       1,
+		"br-gru":       1,
+		"se-sto":       1,
+		"es-mad":       1,
+		"jp-osa":       1,
+		"it-mil":       1,
+		"id-cgk":       1,
+		"us-central":   1,
+		"ap-south":     1,
+		"ap-northeast": 1,
+	}
+
 	LinodeTestRegions = map[string]int{
 		"us-central": 1,
 		"eu-west":    1,

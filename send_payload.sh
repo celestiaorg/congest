@@ -17,7 +17,17 @@ cp ./scripts/init_install.sh ./payload/init_install.sh
 cp ./scripts/txsim.sh ./payload/txsim.sh
 cp ./scripts/vars.sh ./payload/vars.sh
 cp ./scripts/upload_traces.sh ./payload/upload_traces.sh
+cp ./data/congest-remote-key-gbq.json ./payload/congest-remote-key-gbq.json
 
+
+# copy the env vars into a temp file that is included in the payload to each validator 
+echo "export CHAIN_ID=\"$CHAIN_ID\"" >> ./payload/vars.sh
+echo "export AWS_DEFAULT_REGION=\"$AWS_DEFAULT_REGION\"" >> ./payload/vars.sh
+echo "export AWS_ACCESS_KEY_ID=\"$AWS_ACCESS_KEY_ID\"" >> ./payload/vars.sh
+echo "export AWS_SECRET_ACCESS_KEY=\"$AWS_SECRET_ACCESS_KEY\"" >> ./payload/vars.sh
+echo "export S3_BUCKET_NAME=\"$S3_BUCKET_NAME\"" >> ./payload/vars.sh
+
+sleep 30
 
 # Compress the directory
 echo "Compressing the directory $DIRECTORY_TO_TRANSFER..."

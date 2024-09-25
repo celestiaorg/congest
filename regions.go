@@ -20,7 +20,7 @@ var (
 
 	MinimalRegions = network.Regions{
 		DigitalOcean: DOMinimalRegions,
-		Vultr:        VultrMinimalRegions,
+		Linode:       LinodeMinimalRegions,
 	}
 
 	TestRegions = network.Regions{

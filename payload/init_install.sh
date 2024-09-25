@@ -1,17 +1,26 @@
 #!/bin/bash
 
-CELESTIA_APP_COMMIT="dec69e46760f31105666c1ed20197ec02debf9c7"
+CELESTIA_APP_COMMIT="0ef2067ded0e189b4739b70e773f04d6731d3e4c"
 CELES_HOME=".celestia-app"
 MONIKER="validator"
 ARCHIVE_NAME="payload.tar.gz"
 
-  export DEBIAN_FRONTEND=noninteractive
+export DEBIAN_FRONTEND=noninteractive 
+export SEEN_LIMIT="52"
 
-  sudo apt update -y
-  sudo apt install git build-essential ufw curl jq snapd --yes
+apt update -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+
+export DEBIAN_FRONTEND=noninteractive
+apt-get update -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+apt-get install git build-essential ufw curl jq chrony snapd --yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 
 ufw allow 26657/tcp
 ufw allow 26656/tcp
+
+systemctl enable chrony
+systemctl start chrony
+
+export GOOGLE_APPLICATION_CREDENTIALS="/root/payload/congest-remote-key-gbq.json"
 
 # Ensure the script is run as root
 if [ "$(id -u)" -ne 0 ]; then
@@ -43,7 +52,7 @@ sysctl -w net.mptcp.enabled=1
 sysctl -w net.mptcp.mptcp_path_manager=ndiffports
 
 # Specify the number of subflows
-SUBFLOWS=32
+SUBFLOWS=16
 sysctl -w net.mptcp.mptcp_ndiffports=$SUBFLOWS
 
 # Make the changes persistent across reboots
@@ -111,4 +120,4 @@ cp -r payload/$parsed_hostname/keyring-test $HOME/$CELES_HOME
 # run txsim script which starts a sleep timer and txsim in a different tmux session
 source payload/txsim.sh
 
-celestia-appd start
+celestia-appd start 2>&1 | tee -a logs.txt

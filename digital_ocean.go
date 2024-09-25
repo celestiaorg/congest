@@ -78,11 +78,11 @@ var (
 	}
 
 	DOMinimalRegions = map[string]int{
-		"nyc3": 1, "sfo3": 1, "ams3": 1, "sgp1": 1, "lon1": 1, "tor1": 1,
+		"nyc3": 1, "tor1": 1, "sfo3": 1, "ams3": 1, "sgp1": 1, "lon1": 1, "fra1": 1,
 		"blr1": 1, "syd1": 1,
 	}
 
 	DOTestRegions = map[string]int{
-		"sfo3": 1, "lon1": 1,
+		"ams3": 1, "tor1": 1,
 	}
 )

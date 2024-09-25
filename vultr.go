@@ -228,3 +228,6 @@ var (
 		"scl": 1,
 	}
 )
+
+// . ./send_payload.sh && \
+// . ./boot_network.sh

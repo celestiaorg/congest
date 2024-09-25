@@ -7,14 +7,16 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/celestiaorg/celestia-app/v2/app"
-	"github.com/celestiaorg/celestia-app/v2/app/encoding"
-	"github.com/celestiaorg/celestia-app/v2/pkg/appconsts"
-	"github.com/celestiaorg/celestia-app/v2/test/util/genesis"
-	blobtypes "github.com/celestiaorg/celestia-app/v2/x/blob/types"
+	"github.com/celestiaorg/celestia-app/v3/app"
+	"github.com/celestiaorg/celestia-app/v3/app/encoding"
+	"github.com/celestiaorg/celestia-app/v3/test/util/genesis"
+	blobtypes "github.com/celestiaorg/celestia-app/v3/x/blob/types"
+	minfee "github.com/celestiaorg/celestia-app/v3/x/minfee"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/tendermint/tendermint/config"
 	cmtcfg "github.com/tendermint/tendermint/config"
@@ -53,15 +55,16 @@ type Network struct {
 func NewNetwork(chainID string) (*Network, error) {
 	codec := encoding.MakeConfig(app.ModuleEncodingRegisters...)
 	blobParams := blobtypes.DefaultParams()
-	blobParams.GovMaxSquareSize = 128
+	blobParams.GovMaxSquareSize = 512
 	cparams := app.DefaultConsensusParams()
-	cparams.Block.MaxBytes = 10_000_000
+	cparams.Block.MaxBytes = 128_000_000
 
 	g := genesis.NewDefaultGenesis().
 		WithChainID(chainID).
 		WithModifiers(
 			genesis.ImmediateProposals(codec.Codec),
 			genesis.SetBlobParams(codec.Codec, blobParams),
+			// SetMinFee(codec.Codec, 0.000001),
 		).
 		WithConsensusParams(cparams)
 
@@ -70,6 +73,19 @@ func NewNetwork(chainID string) (*Network, error) {
 		validators: make(map[string]NodeInfo),
 		ecfg:       codec,
 	}, nil
+}
+
+func SetMinFee(codec codec.Codec, minFee float64) genesis.Modifier {
+	return func(state map[string]json.RawMessage) map[string]json.RawMessage {
+		minFeeGenState := minfee.DefaultGenesis()
+		gasPrice, err := sdk.NewDecFromStr(fmt.Sprintf("%f", minFee))
+		if err != nil {
+			panic(err)
+		}
+		minFeeGenState.NetworkMinGasPrice = gasPrice
+		state[minfee.ModuleName] = codec.MustMarshalJSON(minFeeGenState)
+		return state
+	}
 }
 
 // AsyncAddValidator will add the validator to the network after the IP address
@@ -117,9 +133,17 @@ func (n *Network) AddValidator(name, ip, payLoadRoot, region string) error {
 		return err
 	}
 
+	addr, err := key.GetAddress()
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("adding txsim account", addr.String())
+
 	err = n.genesis.AddAccount(genesis.Account{
 		PubKey:  pk,
 		Balance: 9999999999999999,
+		Name:    "txsim",
 	})
 
 	if err != nil {
@@ -140,10 +164,6 @@ func (n *Network) Peers() []string {
 	}
 	return peers
 
-}
-
-func (n *Network) AddAccount(name string) {
-	n.accounts = append(n.accounts, name)
 }
 
 func (n *Network) InitNodes(rootDir string) error {
@@ -188,7 +208,7 @@ func (n *Network) InitNodes(rootDir string) error {
 		}
 		ninfo, has := n.validators[vname]
 		if !has {
-			return fmt.Errorf("No validator found %s", vname)
+			return fmt.Errorf("no validator found %s", vname)
 		}
 		ninfo.NetworkAddress = string(nodeKey.ID())
 		n.validators[vname] = ninfo
@@ -251,29 +271,30 @@ func MakeConfig(name string, opts ...Option) (*config.Config, error) {
 	// cfg.P2P.PersistentPeers = strings.Join(node.InitialPeers, ",")
 	cfg.Instrumentation.Prometheus = false
 	cfg.Mempool.Size = 5000
-	cfg.Mempool.CacheSize = 10000
+	cfg.Mempool.CacheSize = 100000
 	cfg.Mempool.MaxTxBytes = 100_000_000
-	cfg.Mempool.MaxTxsBytes = 1_000_000_000
-	cfg.Mempool.Version = "v1"
+	cfg.Mempool.MaxTxsBytes = 5_000_000_000
+	cfg.Mempool.Version = "v2"
 	cfg.Mempool.TTLNumBlocks = 100
 	cfg.Mempool.TTLDuration = 40 * time.Minute
-	cfg.Mempool.MaxGossipDelay = 20 * time.Second
+	cfg.Mempool.MaxGossipDelay = 10 * time.Second
 	cfg.TxIndex.Indexer = "kv"
-	cfg.P2P.MaxNumInboundPeers = 15
-	cfg.P2P.MaxNumOutboundPeers = 10
+	cfg.P2P.MaxNumInboundPeers = 40
+	cfg.P2P.MaxNumOutboundPeers = 30
 	cfg.P2P.PexReactor = true
-	cfg.P2P.RecvRate = 5_120_000
-	cfg.P2P.SendRate = 5_120_000
+	cfg.P2P.RecvRate = 10_120_000
+	cfg.P2P.SendRate = 10_120_000
 	cfg.RPC.MaxBodyBytes = 1_000_000_000
 	cfg.RPC.MaxOpenConnections = 1000
-	cfg.RPC.TimeoutBroadcastTxCommit = 60 * time.Second
+	cfg.RPC.TimeoutBroadcastTxCommit = 120 * time.Second
 	cfg.RPC.MaxSubscriptionClients = 1000
 	cfg.RPC.ListenAddress = "tcp://0.0.0.0:26657"
-	cfg.Consensus.TimeoutPropose = time.Second * 5
-	cfg.Consensus.TimeoutCommit = time.Millisecond * 2700
+	cfg.Consensus.TimeoutPropose = time.Second * 4
+	cfg.Consensus.TimeoutCommit = time.Millisecond * 1000
 	cfg.Consensus.OnlyInternalWal = true
 	cfg.Instrumentation.TraceBufferSize = 5000
 	cfg.Instrumentation.TraceType = "local"
+	cfg.Instrumentation.TracingTables = "mempool_recovery,mempool_tx,mempool_peer_state,consensus_round_state,consensus_block_parts,consensus_block,consensus_state,consensus_proposal,peers,abci"
 
 	for _, opt := range opts {
 		opt(cfg)
@@ -296,7 +317,7 @@ func MakeAppConfig() *serverconfig.Config {
 	// snapshots to nodes that state sync
 	cfg.StateSync.SnapshotInterval = 0
 	cfg.StateSync.SnapshotKeepRecent = 1
-	cfg.MinGasPrices = fmt.Sprintf("%v%s", appconsts.DefaultMinGasPrice, app.BondDenom)
+	cfg.MinGasPrices = fmt.Sprintf("%v%s", 0.00001, app.BondDenom)
 	return cfg
 }
 

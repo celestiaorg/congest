@@ -71,28 +71,29 @@ func main() {
 			ips = append(ips, val.PendingIP)
 		}
 
+		time.Sleep(time.Second)
+
 		pulumi.All(ips).ApplyT(func(_ []interface{}) error {
 			err = n.InitNodes(payloadRoot)
 			if err != nil {
-				log.Fatal(err)
+				panic(err)
 			}
 
 			err = n.SaveAddressBook(payloadRoot, n.Peers())
 			if err != nil {
-				log.Fatal(err)
+				panic(err)
 			}
 
 			err = n.SaveValidatorsToFile(filepath.Join(payloadRoot, "validators.json"))
 			if err != nil {
-				log.Fatal(err)
+				panic(err)
 			}
 
 			return nil
 		})
+		time.Sleep(time.Second * 20)
 
 		return nil
 	})
-
-	// Sleep for 30 seconds to allow for the instance to be accessible
-	time.Sleep(30 * time.Second)
+	time.Sleep(time.Second * 30)
 }
