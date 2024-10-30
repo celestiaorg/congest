@@ -46,7 +46,7 @@ func NewDigitalOcean(timeout string) (*DigitalOcean, error) {
 func (d *DigitalOcean) CreateValidatorInstance(ctx *pulumi.Context, name, region string) (pulumi.StringOutput, error) {
 	droplet, err := digitalocean.NewDroplet(ctx, name, &digitalocean.DropletArgs{
 		Region:  pulumi.String(region),
-		Size:    pulumi.String("s-8vcpu-16gb"),     // Replace with the desired droplet size slug
+		Size:    pulumi.String("c2-16vcpu-32gb"),   // Replace with the desired droplet size slug
 		Image:   pulumi.String("ubuntu-22-04-x64"), // Replace with the desired image slug
 		Name:    pulumi.String(name),
 		SshKeys: pulumi.ToStringArray(d.sshIDs),
@@ -63,8 +63,8 @@ func (d *DigitalOcean) CreateValidatorInstance(ctx *pulumi.Context, name, region
 
 var (
 	DOFullRegions = map[string]int{
-		"nyc3": 4, "tor1": 4, "sfo2": 4, "sfo3": 4, "ams3": 8, "sgp1": 8, "lon1": 7, "fra1": 5,
-		"blr1": 2, "syd1": 8,
+		"nyc3": 6, "tor1": 6, "sfo2": 6, "sfo3": 6, "ams3": 8, "sgp1": 2, "lon1": 8, "fra1": 8,
+		"blr1": 2, "syd1": 2,
 	}
 
 	DOHalfRegions = map[string]int{
@@ -78,8 +78,7 @@ var (
 	}
 
 	DOMinimalRegions = map[string]int{
-		"nyc3": 1, "tor1": 1, "sfo3": 1, "ams3": 1, "sgp1": 1, "lon1": 1, "fra1": 1,
-		"blr1": 1, "syd1": 1,
+		"nyc3": 2, "tor1": 1, "sfo3": 2, "ams3": 2, "lon1": 2, "fra1": 1,
 	}
 
 	DOTestRegions = map[string]int{

@@ -1,12 +1,14 @@
 #!/bin/bash
 
-CELESTIA_APP_COMMIT="0ef2067ded0e189b4739b70e773f04d6731d3e4c"
+CELESTIA_APP_COMMIT="c53ee35822cafa8eef14a590198d2dc7a4f0d816"
 CELES_HOME=".celestia-app"
 MONIKER="validator"
 ARCHIVE_NAME="payload.tar.gz"
 
 export DEBIAN_FRONTEND=noninteractive 
-export SEEN_LIMIT="62"
+
+export SEEN_LIMIT="74" # don't forget to change this!!!
+export INCLUSION_DELAY="45"
 
 apt update -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 
@@ -16,6 +18,8 @@ apt-get install git build-essential ufw curl jq chrony snapd --yes -o Dpkg::Opti
 
 ufw allow 26657/tcp
 ufw allow 26656/tcp
+ufw allow 26657/udp
+ufw allow 26656/udp
 
 systemctl enable chrony
 systemctl start chrony
@@ -60,7 +64,7 @@ echo "Making changes persistent..."
 echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
 echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
 
-# Verify the current TCP congestion control algorithm
+#Verify the current TCP congestion control algorithm
 current_algo=$(sysctl net.ipv4.tcp_congestion_control | awk '{print $3}')
 if [ "$current_algo" == "bbr" ]; then
   echo "Successfully switched to BBR congestion control algorithm."
@@ -120,4 +124,25 @@ cp -r payload/$parsed_hostname/keyring-test $HOME/$CELES_HOME
 # run txsim script which starts a sleep timer and txsim in a different tmux session
 source payload/txsim.sh
 
-celestia-appd start 2>&1 | tee -a logs.txt
+# Get the hostname of the machine
+HOSTNAME=$(hostname)
+
+# Base command
+COMMAND="celestia-appd start --force-no-bbr"
+
+# Define log file path
+LOG_FILE="/root/logs"
+
+# Check if the hostname matches the specific value
+# if [[ "$HOSTNAME" == "validator-2" ]]; then
+#     # If it matches, don't add the log level flag
+#     echo "Starting celestia-appd without log level flag on $HOSTNAME"
+# else
+#     Otherwise, add the log level flag
+#     COMMAND+=" --log_level=\"error\""
+# fi
+
+# # Execute the command and redirect output to the log file
+# eval $COMMAND 2>&1 | tee -a "$LOG_FILE"
+
+celestia-appd start --force-no-bbr 2>&1 | tee -a "$LOG_FILE"

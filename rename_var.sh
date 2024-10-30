@@ -15,17 +15,15 @@ DROPLET_IPS=$(echo "$STACK_OUTPUT" | jq -r '.[]')
 
 # Variables
 USER="root"
-TMUX_SESSION_NAME="txsim"
-COMMAND="./go/bin/txsim .celestia-app/keyring-test --blob 3 --blob-amounts 1 --blob-sizes 100000-200001 --key-path .celestia-app --grpc-endpoint localhost:9090 --feegrant"
-# COMMAND="tmux send-keys -t app 'export SEEN_LIMIT=83' C-m"
+TMUX_SESSION_NAME="app"
+COMMAND="export SEEN_LIMI=\"84\""
 
 # Function to start tmux session on a remote server
-start_tmux_session() {
+change_var() {
   local IP=$1
   {
     echo "Starting tmux session on $IP -----------------------------------------------------"
     ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${SSH_KEY} ${USER}@${IP} << EOF
-tmux new-session -d -s ${TMUX_SESSION_NAME}
 tmux send-keys -t ${TMUX_SESSION_NAME} "${COMMAND}" C-m
 EOF
     echo "Tmux session started on $IP"
@@ -41,19 +39,9 @@ EOF
   fi
 }
 
-MAX_LOOPS=100
-COUNTER=0
-
+# Loop through the IPs and run the start_tmux_session function in parallel
 for IP in $DROPLET_IPS; do
   start_tmux_session "$IP" &
-
-  # Increment the counter
-  COUNTER=$((COUNTER + 1))
-
-  # Check if the counter has reached the max number of loops
-  if [ "$COUNTER" -ge "$MAX_LOOPS" ]; then
-    break
-  fi
 done
 
 # Wait for all background processes to finish

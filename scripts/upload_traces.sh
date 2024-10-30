@@ -14,7 +14,9 @@ echo "CHAIN_ID after sourcing vars.sh: $CHAIN_ID"
 # Set environment variables
 PROJECT_ID="numeric-mile-433416-e9"
 DATASET_ID="traces"
-CHAIN_ID="big-blonks-22"
+
+CHAIN_ID="no-bbr-3"
+
 LOCAL_DIR="/root/.celestia-app/data/traces"
 
 # gcloud auth activate-service-account --key-file="/root/payload/congest-remote-key-gbq.json" -q
@@ -29,7 +31,7 @@ hostname=$(hostname)
 nodeID=$(echo $hostname | awk -F'-' '{print $1 "-" $2}')
 
 source_dir="/root/.celestia-app/data/traces"
-logs_path="/root/logs.txt"
+logs_path="/root/logs"
 
 # clean the data by removing the last line
 find $source_dir -type f -name "*.jsonl" -exec sed -i '$d' {} \;

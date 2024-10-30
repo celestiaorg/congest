@@ -17,6 +17,7 @@ cp ./scripts/init_install.sh ./payload/init_install.sh
 cp ./scripts/txsim.sh ./payload/txsim.sh
 cp ./scripts/vars.sh ./payload/vars.sh
 cp ./scripts/upload_traces.sh ./payload/upload_traces.sh
+cp ./scripts/shutdown_txsim.sh ./payload/shutdown_txsim.sh
 cp ./data/congest-remote-key-gbq.json ./payload/congest-remote-key-gbq.json
 
 

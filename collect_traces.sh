@@ -15,7 +15,7 @@ DROPLET_IPS=$(echo "$STACK_OUTPUT" | jq -r '.[]')
 
 # Variables
 USER="root"
-TMUX_SESSION_NAME="traces"
+TMUX_SESSION_NAME="traces-1"
 COMMAND=". ./payload/upload_traces.sh"
 
 # Function to start tmux session on a remote server

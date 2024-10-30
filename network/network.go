@@ -55,9 +55,9 @@ type Network struct {
 func NewNetwork(chainID string) (*Network, error) {
 	codec := encoding.MakeConfig(app.ModuleEncodingRegisters...)
 	blobParams := blobtypes.DefaultParams()
-	blobParams.GovMaxSquareSize = 512
+	blobParams.GovMaxSquareSize = 128
 	cparams := app.DefaultConsensusParams()
-	cparams.Block.MaxBytes = 128_000_000
+	cparams.Block.MaxBytes = 9_000_000
 
 	g := genesis.NewDefaultGenesis().
 		WithChainID(chainID).
@@ -270,32 +270,40 @@ func MakeConfig(name string, opts ...Option) (*config.Config, error) {
 	// cfg.P2P.ExternalAddress = fmt.Sprintf("tcp://%v", node.AddressP2P(false))
 	// cfg.P2P.PersistentPeers = strings.Join(node.InitialPeers, ",")
 	cfg.Instrumentation.Prometheus = false
-	cfg.Mempool.Size = 5000
-	cfg.Mempool.CacheSize = 100000
+	cfg.Mempool.Size = 10000
+	cfg.Mempool.CacheSize = 1000000
+	cfg.Mempool.KeepInvalidTxsInCache = true
 	cfg.Mempool.MaxTxBytes = 100_000_000
-	cfg.Mempool.MaxTxsBytes = 5_000_000_000
-	cfg.Mempool.Version = "v2"
-	cfg.Mempool.TTLNumBlocks = 100
-	cfg.Mempool.TTLDuration = 40 * time.Minute
-	cfg.Mempool.MaxGossipDelay = 10 * time.Second
-	cfg.TxIndex.Indexer = "kv"
-	cfg.P2P.MaxNumInboundPeers = 40
-	cfg.P2P.MaxNumOutboundPeers = 30
+	cfg.Mempool.MaxTxsBytes = 10_000_000_000
+	cfg.Mempool.Version = "v1"
+	cfg.Mempool.TTLNumBlocks = 0
+	cfg.Mempool.Recheck = true
+	cfg.Storage.DiscardABCIResponses = true
+	cfg.Mempool.TTLDuration = 0
+	cfg.Mempool.MaxGossipDelay = 60 * time.Second
+	cfg.Mempool.Broadcast = true
+	cfg.TxIndex.Indexer = "null"
+	cfg.P2P.MaxNumInboundPeers = 13
+	cfg.P2P.MaxNumOutboundPeers = 8
+	cfg.P2P.MaxPacketMsgPayloadSize = 1_000_000_000
 	cfg.P2P.PexReactor = true
-	cfg.P2P.RecvRate = 10_120_000
-	cfg.P2P.SendRate = 10_120_000
+	cfg.P2P.RecvRate = 100_120_000 // increase on a whim to limit peer disconnections
+	cfg.P2P.SendRate = 5_120_000
+	// cfg.Consensus.PeerGossipSleepDuration = time.Millisecond * 75
 	cfg.RPC.MaxBodyBytes = 1_000_000_000
 	cfg.RPC.MaxOpenConnections = 1000
 	cfg.RPC.TimeoutBroadcastTxCommit = 120 * time.Second
 	cfg.RPC.MaxSubscriptionClients = 1000
 	cfg.RPC.ListenAddress = "tcp://0.0.0.0:26657"
-	cfg.Consensus.TimeoutPropose = time.Second * 4
-	cfg.Consensus.TimeoutCommit = time.Millisecond * 1000
+	cfg.Consensus.TimeoutPropose = time.Millisecond * 3500
+	cfg.Consensus.TimeoutCommit = time.Millisecond * 4200
 	cfg.Consensus.OnlyInternalWal = true
-	cfg.Instrumentation.TraceBufferSize = 5000
+	cfg.Instrumentation.TraceBufferSize = 6000
 	cfg.Instrumentation.TraceType = "local"
-	cfg.Instrumentation.TracingTables = "mempool_recovery,mempool_tx,mempool_peer_state,consensus_round_state,consensus_block_parts,consensus_block,consensus_state,consensus_proposal,peers,abci"
-
+	cfg.Instrumentation.TracingTables = "consensus_block_parts,consensus_round_state,consensus_block,consensus_proposal,peers,abci"
+	// cfg.Instrumentation.TracingTables = "mempool_seen,mempool_size,mempool_rejected,mempool_recovery,mempool_tx,consensus_round_state,consensus_block,consensus_proposal,peers,abci"
+	// cfg.Instrumentation.PyroscopeTrace = true
+	// cfg.Instrumentation.PyroscopeURL = "http://104.131.65.193:4040/"
 	for _, opt := range opts {
 		opt(cfg)
 	}
