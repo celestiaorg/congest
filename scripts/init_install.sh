@@ -133,16 +133,14 @@ COMMAND="celestia-appd start --force-no-bbr"
 # Define log file path
 LOG_FILE="/root/logs"
 
-# Check if the hostname matches the specific value
-# if [[ "$HOSTNAME" == "validator-2" ]]; then
-#     # If it matches, don't add the log level flag
-#     echo "Starting celestia-appd without log level flag on $HOSTNAME"
-# else
-#     Otherwise, add the log level flag
-#     COMMAND+=" --log_level=\"error\""
-# fi
+Check if the hostname matches the specific value
+if [[ "$HOSTNAME" == "validator-2" ]]; then
+    # If it matches, don't add the log level flag
+    echo "Starting celestia-appd without log level flag on $HOSTNAME"
+else
+    Otherwise, add the log level flag
+    COMMAND+=" --log_level=\"error\""
+fi
 
-# # Execute the command and redirect output to the log file
-# eval $COMMAND 2>&1 | tee -a "$LOG_FILE"
-
-celestia-appd start --force-no-bbr 2>&1 | tee -a "$LOG_FILE"
+# Execute the command and redirect output to the log file
+eval $COMMAND 2>&1 | tee -a "$LOG_FILE"
