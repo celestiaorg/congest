@@ -11,12 +11,7 @@ apt update -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-c
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-apt-get install git build-essential ufw curl jq chrony snapd --yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-
-ufw allow 26657/tcp
-ufw allow 26656/tcp
-ufw allow 26657/udp
-ufw allow 26656/udp
+apt-get install git build-essential curl jq chrony snapd --yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 
 systemctl enable chrony
 systemctl start chrony
