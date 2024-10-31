@@ -5,10 +5,7 @@ CELES_HOME=".celestia-app"
 MONIKER="validator"
 ARCHIVE_NAME="payload.tar.gz"
 
-export DEBIAN_FRONTEND=noninteractive 
-
-export SEEN_LIMIT="74" # don't forget to change this!!!
-export INCLUSION_DELAY="45"
+export DEBIAN_FRONTEND=noninteractive
 
 apt update -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 
