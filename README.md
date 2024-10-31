@@ -49,7 +49,7 @@ following commands to deploy the infrastructure (there can be limits set on the
 number of virtual machines one account can deploy, be sure to set those high enough):
 
 ```sh
-make deploy Test100Nodes8MB tcp-congestion-1
+make deploy test tcp-congestion-1
 ```
 
 This test will then proceed to configure and spin up 100 geographically
