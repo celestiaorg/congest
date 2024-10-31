@@ -64,7 +64,7 @@ via the normal mechanisms supported by the tracer (such as pushing to an s3
 bucket), however, if only a single trace file is needed, we can also call
 
 ```sh
-source download_traces.sh validator-1 consensus_block.jsonl
+source download_trace.sh validator-1 consensus_block.jsonl
 ```
 
 The trace collection process is triggered via the `make down` command, however
