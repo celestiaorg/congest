@@ -125,7 +125,7 @@ COMMAND="celestia-appd start"
 # Define log file path
 LOG_FILE="/root/logs"
 
-Check if the hostname matches the specific value
+# Check if the hostname matches the specific value
 if [[ "$HOSTNAME" == "validator-2" ]]; then
     # If it matches, don't add the log level flag
     echo "Starting celestia-appd without log level flag on $HOSTNAME"
