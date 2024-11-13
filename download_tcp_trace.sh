@@ -11,7 +11,7 @@ NAME="$1"
 FILE_TYPE="$2"
 
 # Set default SSH key location
-DEFAULT_SSH_KEY="~/.ssh/id_rsa"
+DEFAULT_SSH_KEY="~/.ssh/do"
 
 # Allow user to override the SSH key location
 SSH_KEY=${SSH_KEY:-$DEFAULT_SSH_KEY}

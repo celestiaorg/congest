@@ -5,7 +5,7 @@ import "congest/network"
 var (
 	FullRegions = network.Regions{
 		DigitalOcean: DOFullRegions,
-		Linode:       LinodeFullRegions,
+		//Linode:       LinodeFullRegions,
 	}
 
 	HalfRegions = network.Regions{

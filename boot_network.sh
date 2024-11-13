@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set default SSH key location
-DEFAULT_SSH_KEY="~/.ssh/id_rsa"
+DEFAULT_SSH_KEY="~/.ssh/do"
 
 # Allow user to override the SSH key location
 SSH_KEY=${SSH_KEY:-$DEFAULT_SSH_KEY}
@@ -36,8 +36,5 @@ boot_node() {
 
 # Loop through the IPs and run the boot command in parallel
 for IP in $DROPLET_IPS; do
-  boot_node "$IP" &
+  boot_node "$IP"
 done
-
-# Wait for all background processes to finish
-wait

@@ -5,4 +5,4 @@ rm payload/addrbook.json
 rm payload/ips.json
 rm payload/validators.json
 rm payload/genesis.json
-rm payload/congest-remote-key-gbq.json
+#rm payload/congest-remote-key-gbq.json

@@ -7,9 +7,9 @@ collect-traces:
 # up wraps the pulumi up command to automate calling the scripts that initialize the network
 up:
 	set -e; \
-	pulumi up --yes --continue-on-error && \
-	 . ./send_payload.sh && \
-	 . ./boot_network.sh
+	pulumi up --yes --continue-on-error
+	# . ./send_payload.sh && \
+#	 . ./boot_network.sh
 
 # down wraps the pulumi down command to also clean up local objects
 down:

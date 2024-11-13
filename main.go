@@ -51,18 +51,18 @@ func main() {
 			log.Fatal(err)
 		}
 
-		linode, err := NewLinodeProvider(GlobalTimeoutString)
-		if err != nil {
-			log.Fatal(err)
-		}
+		//linode, err := NewLinodeProvider(GlobalTimeoutString)
+		//if err != nil {
+		//	log.Fatal(err)
+		//}
 
 		var validators []network.NodeInfo
 
 		DOVals, cursor := DeployValidators(ctx, do, experiment.Regions.DigitalOcean, cursor)
 		validators = append(validators, DOVals...)
 
-		linodeVals, cursor := DeployValidators(ctx, linode, experiment.Regions.Linode, cursor)
-		validators = append(validators, linodeVals...)
+		//linodeVals, cursor := DeployValidators(ctx, linode, experiment.Regions.Linode, cursor)
+		//validators = append(validators, linodeVals...)
 
 		ips := make([]pulumi.StringOutput, 0, len(validators))
 
