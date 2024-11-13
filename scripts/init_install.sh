@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CELESTIA_APP_COMMIT="ba0697af4cfa9e54906e4c6821bc932c6a04c562"
+CELESTIA_APP_COMMIT="6c76e61c32c37bc41ebfddeec9c058663f255178"
 CELES_HOME=".celestia-app"
 MONIKER="validator"
 ARCHIVE_NAME="payload.tar.gz"
@@ -135,5 +135,7 @@ else
     COMMAND+=" --log_level=\"error\""
 fi
 
-# Execute the command and redirect output to the log file
-eval $COMMAND 2>&1 | tee -a "$LOG_FILE"
+for i in {1..10}; do
+    eval $COMMAND 2>&1 | tee -a "$LOG_FILE"
+    time 30
+done
