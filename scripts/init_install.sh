@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CELESTIA_APP_COMMIT="bc52efe1250c468fa41e611214b20389329e159f"
+CELESTIA_APP_COMMIT="ef3039778d78283d1de7c471a38a68c2f2b892ae"
 CELES_HOME=".celestia-app"
 MONIKER="validator"
 ARCHIVE_NAME="payload.tar.gz"
@@ -11,7 +11,7 @@ apt update -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-c
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-apt-get install git build-essential curl jq chrony snapd --yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+apt-get install git build-essential curl jq chrony snapd nethogs --yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 
 systemctl enable chrony
 systemctl start chrony
@@ -114,7 +114,7 @@ mv payload/$parsed_hostname/config.toml $HOME/$CELES_HOME/config/config.toml
 cp -r payload/$parsed_hostname/keyring-test $HOME/$CELES_HOME
 
 # run txsim script which starts a sleep timer and txsim in a different tmux session
-source payload/txsim.sh
+#source payload/txsim.sh
 
 
 # Get the hostname of the machine
