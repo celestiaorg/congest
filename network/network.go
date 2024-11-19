@@ -287,8 +287,8 @@ func MakeConfig(name string, opts ...Option) (*config.Config, error) {
 	cfg.P2P.MaxNumOutboundPeers = 8
 	cfg.P2P.MaxPacketMsgPayloadSize = 1_000_000_000
 	cfg.P2P.PexReactor = true
-	cfg.P2P.RecvRate = 5_120_000
-	cfg.P2P.SendRate = 5_120_000
+	cfg.P2P.RecvRate = 100_000_000_000
+	cfg.P2P.SendRate = 100_000_000_000
 	// cfg.Consensus.PeerGossipSleepDuration = time.Millisecond * 75
 	cfg.RPC.MaxBodyBytes = 1_000_000_000
 	cfg.RPC.MaxOpenConnections = 1000
