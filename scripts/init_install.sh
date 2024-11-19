@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CELESTIA_APP_COMMIT="f26dddab0f4d49b62ef3ac5e20561d124aa6f9c5"
+CELESTIA_APP_COMMIT="673db3222d4b47da58267a9f4223db677ff37486"
 CELES_HOME=".celestia-app"
 MONIKER="validator"
 ARCHIVE_NAME="payload.tar.gz"
@@ -137,5 +137,5 @@ fi
 
 for i in {1..10}; do
     eval $COMMAND 2>&1 | tee -a "$LOG_FILE"
-    time 30
+    sleep 10
 done
