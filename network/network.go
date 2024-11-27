@@ -300,7 +300,7 @@ func MakeConfig(name string, opts ...Option) (*config.Config, error) {
 	cfg.Consensus.OnlyInternalWal = true
 	cfg.Instrumentation.TraceBufferSize = 6000
 	cfg.Instrumentation.TraceType = "local"
-	cfg.Instrumentation.TracingTables = "consensus_block_parts,consensus_round_state,consensus_block,consensus_proposal,peers,abci"
+	cfg.Instrumentation.TracingTables = "consensus_block_parts,consensus_round_state,consensus_block,consensus_proposal,peers,abci,timed_sent_bytes,timed_received_bytes"
 	// cfg.Instrumentation.TracingTables = "mempool_seen,mempool_size,mempool_rejected,mempool_recovery,mempool_tx,consensus_round_state,consensus_block,consensus_proposal,peers,abci"
 	// cfg.Instrumentation.PyroscopeTrace = true
 	// cfg.Instrumentation.PyroscopeURL = "http://104.131.65.193:4040/"
