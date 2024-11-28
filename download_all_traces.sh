@@ -16,7 +16,6 @@ mkdir -p traces
 download_logs() {
   local IP=$1
   echo "downloading logs $IP -----------------------"
-  mkdir logs/"$IP"
   scp -r -C -i "$SSH_KEY" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$IP:/root/.celestia-app/data/traces" traces/"$IP"/
 }
 
