@@ -70,6 +70,10 @@ tar -xzf /root/$ARCHIVE_NAME -C /root/
 
 #source ./vars.sh
 
+# increase udp buffers to 900mb
+sudo sysctl -w net.core.rmem_max=962144000
+sudo sysctl -w net.core.rmem_default=962144000
+
 sudo snap install go --channel=1.22/stable --classic
 
 echo 'export GOPATH="$HOME/go"' >> ~/.profile
