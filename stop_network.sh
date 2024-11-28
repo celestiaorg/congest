@@ -16,7 +16,7 @@ mkdir -p traces
 stop_network() {
   local IP=$1
   echo "stopping network $IP -----------------------"
-  ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@"$IP" killall celestia-appd
+  ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@"$IP" "killall celestia-appd"
 }
 
 # Loop through the IPs and run the download logs function
