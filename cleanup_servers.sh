@@ -20,5 +20,5 @@ remove_data() {
 
 # Loop through the IPs and run the transfer and uncompress in parallel
 for IP in $DROPLET_IPS; do
-  remove_data "$IP"
+  remove_data "$IP" &
 done
