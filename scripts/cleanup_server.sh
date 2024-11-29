@@ -1,6 +1,6 @@
 #!/bin/bash
 
-killall celestia-appd
+tmux kill-session -t app
 rm -rf /root/payload
 rm -rf /root/payload.tar.gz
 rm -rf /root/.celestia-app
