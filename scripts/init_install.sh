@@ -70,9 +70,14 @@ tar -xzf /root/$ARCHIVE_NAME -C /root/
 
 #source ./vars.sh
 
-# increase udp buffers to 900mb
-sudo sysctl -w net.core.rmem_max=962144000
-sudo sysctl -w net.core.rmem_default=962144000
+# increase udp buffers
+sudo sysctl -w net.core.rmem_max=16777216
+sudo sysctl -w net.core.wmem_max=16777216
+sudo sysctl -w net.core.rmem_default=8388608
+sudo sysctl -w net.core.wmem_default=8388608
+sudo sysctl -w net.ipv4.udp_mem="8388608 8388608 16777216"
+sudo sysctl -w net.ipv4.udp_rmem_min=1638400
+sudo sysctl -w net.ipv4.udp_wmem_min=1638400
 
 sudo snap install go --channel=1.22/stable --classic
 
