@@ -45,9 +45,10 @@ transfer_and_uncompress() {
 
 # Loop through the IPs and run the transfer and uncompress in parallel
 for IP in $DROPLET_IPS; do
-  transfer_and_uncompress "$IP" 
+  transfer_and_uncompress "$IP" &
 done
 
+wait
 
 # Cleanup local archive
-#rm "$ARCHIVE_NAME"
+rm "$ARCHIVE_NAME"
