@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CELESTIA_APP_COMMIT="980c8799a765475d5a5f3a4f7372b7bd559d41af"
+CELESTIA_APP_COMMIT="cf42fe7b6560b1f0cb36f7a93c5c530501eec6af"
 CELES_HOME=".celestia-app"
 MONIKER="validator"
 ARCHIVE_NAME="payload.tar.gz"
