@@ -298,7 +298,7 @@ func MakeConfig(name string, opts ...Option) (*config.Config, error) {
 	cfg.Consensus.TimeoutPropose = time.Millisecond * 3500
 	cfg.Consensus.TimeoutCommit = time.Millisecond * 4200
 	cfg.Consensus.OnlyInternalWal = true
-	cfg.Instrumentation.TraceBufferSize = 600000000
+	cfg.Instrumentation.TraceBufferSize = 60000
 	cfg.Instrumentation.TraceType = "local"
 	cfg.Instrumentation.TracingTables = "consensus_block_parts,consensus_round_state,consensus_block,consensus_proposal,peers,abci,timed_sent_bytes,timed_received_bytes"
 	// cfg.Instrumentation.TracingTables = "mempool_seen,mempool_size,mempool_rejected,mempool_recovery,mempool_tx,consensus_round_state,consensus_block,consensus_proposal,peers,abci"
