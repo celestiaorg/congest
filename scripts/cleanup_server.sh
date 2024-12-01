@@ -7,3 +7,4 @@ rm -rf /root/.celestia-app
 rm -rf /root/celestia-app
 rm -rf /root/logs
 rm -rf /root/go/bin/*
+rm -rf /root/quic-bench
