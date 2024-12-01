@@ -21,5 +21,7 @@ stop_network() {
 
 # Loop through the IPs and run the download logs function
 for IP in $DROPLET_IPS; do
-  stop_network "$IP"
+  stop_network "$IP" &
 done
+
+wait

@@ -22,3 +22,5 @@ remove_data() {
 for IP in $DROPLET_IPS; do
   remove_data "$IP" &
 done
+
+wait
