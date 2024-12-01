@@ -9,7 +9,7 @@ else
     exit 1
 fi
 
-apt install -y build-essential jq git htop vim nethogs
+apt install build-essential jq git htop vim nethogs --yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 
 export PATH=$PATH:~/go/bin:/usr/local/go/bin
 echo 'export PATH=$PATH:~/go/bin:/usr/local/go/bin' >> ~/.bashrc
