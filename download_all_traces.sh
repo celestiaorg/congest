@@ -21,5 +21,7 @@ download_logs() {
 
 # Loop through the IPs and run the download logs function
 for IP in $DROPLET_IPS; do
-  download_logs "$IP"
+  download_logs "$IP" &
 done
+
+wait
