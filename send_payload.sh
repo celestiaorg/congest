@@ -19,6 +19,7 @@ cp ./scripts/vars.sh ./payload/vars.sh
 cp ./scripts/upload_traces.sh ./payload/upload_traces.sh
 cp ./scripts/shutdown_txsim.sh ./payload/shutdown_txsim.sh
 cp ./scripts/cleanup_server.sh ./payload/cleanup_server.sh
+cp ./scripts/quic_bench_init_install.sh ./payload/quic_bench_init_install.sh
 #cp ./data/congest-remote-key-gbq.json ./payload/congest-remote-key-gbq.json
 
 # copy the env vars into a temp file that is included in the payload to each validator 
