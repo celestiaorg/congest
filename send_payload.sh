@@ -51,4 +51,4 @@ done
 wait
 
 # Cleanup local archive
-rm "$ARCHIVE_NAME"
+#rm "$ARCHIVE_NAME"
