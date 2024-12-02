@@ -14,6 +14,15 @@ apt install build-essential jq git htop vim nethogs --yes -o Dpkg::Options::="--
 export PATH=$PATH:~/go/bin:/usr/local/go/bin
 echo 'export PATH=$PATH:~/go/bin:/usr/local/go/bin' >> ~/.bashrc
 
+# increase udp buffers
+sudo sysctl -w net.core.rmem_max=16777216
+sudo sysctl -w net.core.wmem_max=16777216
+sudo sysctl -w net.core.rmem_default=8388608
+sudo sysctl -w net.core.wmem_default=8388608
+sudo sysctl -w net.ipv4.udp_mem="8388608 8388608 16777216"
+sudo sysctl -w net.ipv4.udp_rmem_min=1638400
+sudo sysctl -w net.ipv4.udp_wmem_min=1638400
+
 git clone https://github.com/rach-id/quic-bench
 cd quic-bench
 go mod tidy
