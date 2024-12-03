@@ -129,7 +129,7 @@ cp -r payload/$parsed_hostname/keyring-test $HOME/$CELES_HOME
 HOSTNAME=$(hostname)
 
 # Base command
-COMMAND="celestia-appd start"
+COMMAND="celestia-appd start --force-no-bbr"
 
 # Define log file path
 LOG_FILE="/root/logs"
