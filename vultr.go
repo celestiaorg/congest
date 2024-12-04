@@ -38,8 +38,8 @@ func NewVultr(timeout string) (*Vultr, error) {
 func (v *Vultr) CreateValidatorInstance(ctx *pulumi.Context, name, region string) (pulumi.StringOutput, error) {
 	instance, err := vultr.NewInstance(ctx, name, &vultr.InstanceArgs{
 		Region:    pulumi.String(region),
-		Plan:      pulumi.String("vc2-24c-96gb"), // Replace with the desired instance plan
-		OsId:      pulumi.Int(387),               // Replace with the desired OS ID (e.g., 387 for Ubuntu 22.04)
+		Plan:      pulumi.String("vc2-6c-16gb"), // Replace with the desired instance plan
+		OsId:      pulumi.Int(387),              // Replace with the desired OS ID (e.g., 387 for Ubuntu 22.04)
 		Label:     pulumi.String(name),
 		SshKeyIds: pulumi.ToStringArray(v.sshIDs),
 		Hostname:  pulumi.String(name),
