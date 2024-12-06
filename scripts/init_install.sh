@@ -11,7 +11,7 @@ apt update -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-c
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-apt-get install git build-essential curl jq chrony snapd nethogs --yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+apt-get install git build-essential curl jq chrony snapd nethogs nethogs --yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 
 systemctl enable chrony
 systemctl start chrony
