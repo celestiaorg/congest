@@ -3,7 +3,7 @@
 DIRECTORY_TO_TRANSFER="./payload"
 ARCHIVE_NAME="payload.tar.gz"
 # Set default SSH key location
-DEFAULT_SSH_KEY="~/.ssh/id_rsa"
+DEFAULT_SSH_KEY="~/.ssh/id_ed25519"
 # Allow user to override the SSH key location
 SSH_KEY=${SSH_KEY:-$DEFAULT_SSH_KEY}
 
@@ -18,7 +18,10 @@ cp ./scripts/txsim.sh ./payload/txsim.sh
 cp ./scripts/vars.sh ./payload/vars.sh
 cp ./scripts/upload_traces.sh ./payload/upload_traces.sh
 cp ./scripts/shutdown_txsim.sh ./payload/shutdown_txsim.sh
-cp ./data/congest-remote-key-gbq.json ./payload/congest-remote-key-gbq.json
+cp ./scripts/debug_install.sh ./payload/debug_install.sh
+cp /home/evan/go/src/github.com/celestiaorg/celestia-app/build/celestia-appd ./payload/celestia-appd
+cp /home/evan/go/src/github.com/celestiaorg/celestia-app/build/txsim ./payload/txsim
+
 
 
 # copy the env vars into a temp file that is included in the payload to each validator 
@@ -28,7 +31,7 @@ echo "export AWS_ACCESS_KEY_ID=\"$AWS_ACCESS_KEY_ID\"" >> ./payload/vars.sh
 echo "export AWS_SECRET_ACCESS_KEY=\"$AWS_SECRET_ACCESS_KEY\"" >> ./payload/vars.sh
 echo "export S3_BUCKET_NAME=\"$S3_BUCKET_NAME\"" >> ./payload/vars.sh
 
-sleep 30
+# sleep 30
 
 # Compress the directory
 echo "Compressing the directory $DIRECTORY_TO_TRANSFER..."

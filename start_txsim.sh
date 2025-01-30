@@ -2,7 +2,7 @@
 
 # Expand the SSH key path
 # Set default SSH key location
-DEFAULT_SSH_KEY="~/.ssh/id_rsa"
+DEFAULT_SSH_KEY="~/.ssh/id_ed25519"
 
 # Allow user to override the SSH key location
 SSH_KEY=${SSH_KEY:-$DEFAULT_SSH_KEY}
@@ -16,7 +16,7 @@ DROPLET_IPS=$(echo "$STACK_OUTPUT" | jq -r '.[]')
 # Variables
 USER="root"
 TMUX_SESSION_NAME="txsim"
-COMMAND="./go/bin/txsim .celestia-app/keyring-test --blob 3 --blob-amounts 1 --blob-sizes 100000-200001 --key-path .celestia-app --grpc-endpoint localhost:9090 --feegrant"
+COMMAND="txsim .celestia-app/keyring-test --blob 1 --blob-amounts 1 --blob-sizes 500000-1000001 --key-path .celestia-app --grpc-endpoint localhost:9090 --feegrant"
 # COMMAND="tmux send-keys -t app 'export SEEN_LIMIT=83' C-m"
 
 # Function to start tmux session on a remote server

@@ -63,8 +63,7 @@ func (d *DigitalOcean) CreateValidatorInstance(ctx *pulumi.Context, name, region
 
 var (
 	DOFullRegions = map[string]int{
-		"nyc3": 6, "tor1": 6, "sfo2": 6, "sfo3": 6, "ams3": 8, "sgp1": 2, "lon1": 8, "fra1": 8,
-		"blr1": 2, "syd1": 2,
+		"nyc3": 6, "tor1": 6, "sfo2": 2, "sfo3": 6, "ams3": 8, "sgp1": 4, "lon1": 8, "fra1": 6, "syd1": 6,
 	}
 
 	DOHalfRegions = map[string]int{
@@ -78,7 +77,7 @@ var (
 	}
 
 	DOMinimalRegions = map[string]int{
-		"nyc3": 2, "tor1": 1, "sfo3": 2, "ams3": 2, "lon1": 2, "fra1": 1,
+		"nyc3": 2, "tor1": 2, "sfo3": 2, "ams3": 2, "lon1": 2,
 	}
 
 	DOTestRegions = map[string]int{

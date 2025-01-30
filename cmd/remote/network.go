@@ -1,4 +1,4 @@
-package network
+package main
 
 import (
 	"encoding/json"
@@ -55,9 +55,9 @@ type Network struct {
 func NewNetwork(chainID string) (*Network, error) {
 	codec := encoding.MakeConfig(app.ModuleEncodingRegisters...)
 	blobParams := blobtypes.DefaultParams()
-	blobParams.GovMaxSquareSize = 128
+	blobParams.GovMaxSquareSize = 256
 	cparams := app.DefaultConsensusParams()
-	cparams.Block.MaxBytes = 9_000_000
+	cparams.Block.MaxBytes = 35_000_000
 
 	g := genesis.NewDefaultGenesis().
 		WithChainID(chainID).
@@ -303,16 +303,16 @@ func MakeConfig(name string, opts ...Option) (*config.Config, error) {
 	cfg.Mempool.Version = "v2"
 	cfg.Mempool.TTLNumBlocks = 0
 	cfg.Mempool.Recheck = true
-	cfg.Mempool.Broadcast = false
+	cfg.Mempool.Broadcast = true
 	cfg.Storage.DiscardABCIResponses = true
 	cfg.Mempool.TTLDuration = 0
 	cfg.Mempool.MaxGossipDelay = 60 * time.Second
 	cfg.TxIndex.Indexer = "null"
-	cfg.P2P.MaxNumInboundPeers = 20
+	cfg.P2P.MaxNumInboundPeers = 15
 	cfg.P2P.MaxNumOutboundPeers = 12
 	cfg.P2P.MaxPacketMsgPayloadSize = 1_000_000_000
 	cfg.P2P.PexReactor = true
-	cfg.P2P.RecvRate = 1_000_120_000 // increase on a whim to limit peer disconnections
+	cfg.P2P.RecvRate = 2_000_120_000 // increase on a whim to limit peer disconnections
 	cfg.P2P.SendRate = 1_000_120_000
 	// cfg.Consensus.PeerGossipSleepDuration = time.Millisecond * 75
 	cfg.RPC.MaxBodyBytes = 1_000_000_000
@@ -325,7 +325,8 @@ func MakeConfig(name string, opts ...Option) (*config.Config, error) {
 	cfg.Consensus.OnlyInternalWal = true
 	cfg.Instrumentation.TraceBufferSize = 6000
 	cfg.Instrumentation.TraceType = "local"
-	cfg.Instrumentation.TracingTables = "consensus_round_state,consensus_block,peers"
+	cfg.FastSyncMode = true
+	cfg.Instrumentation.TracingTables = "consensus_round_state,consensus_block_parts,bp_state,consensus_block,consensus_proposal,peers,notes"
 	// all tracing tables
 	// cfg.Instrumentation.TracingTables = "mempool_tx,mempool_peer_state,consensus_round_state,consensus_block_parts,bp_state,consensus_block,consensus_vote,consensus_state,consensus_proposal,peers,pending_bytes,received_bytes,abci"
 	// cfg.Instrumentation.PyroscopeTrace = true

@@ -1,14 +1,13 @@
 #!/bin/bash
 
 # Check if the correct number of arguments is provided
-if [ "$#" -ne 2 ]; then
-    echo "Usage: source script.sh <name> <file_type>.jsonl"
+if [ "$#" -ne 1 ]; then
+    echo "Usage: source script.sh <name>"
     return 1
 fi
 
 # Get the name and file type from the arguments
 NAME="$1"
-FILE_TYPE="$2"
 
 # Set default SSH key location
 DEFAULT_SSH_KEY="~/.ssh/id_ed25519"
@@ -30,10 +29,10 @@ if [ -z "$IP_ADDRESS" ]; then
 fi
 
 # Define the source file path on the remote server
-REMOTE_FILE="root@$IP_ADDRESS:/root/$FILE_TYPE"
+REMOTE_FILE="root@$IP_ADDRESS:/root/logs"
 
 # Define the destination file path
-DEST_FILE="./$FILE_TYPE"
+DEST_FILE="./$NAME_logs"
 
 # Download the file from the remote server to the current directory
 scp -i "$SSH_KEY" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$REMOTE_FILE" "$DEST_FILE"

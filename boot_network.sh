@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set default SSH key location
-DEFAULT_SSH_KEY="~/.ssh/id_rsa"
+DEFAULT_SSH_KEY="~/.ssh/id_ed25519"
 
 # Allow user to override the SSH key location
 SSH_KEY=${SSH_KEY:-$DEFAULT_SSH_KEY}

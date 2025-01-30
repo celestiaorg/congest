@@ -2,7 +2,7 @@
 
 # Expand the SSH key path
 # Set default SSH key location
-DEFAULT_SSH_KEY="~/.ssh/id_rsa"
+DEFAULT_SSH_KEY="~/.ssh/id_ed25519"
 
 # Allow user to override the SSH key location
 SSH_KEY=${SSH_KEY:-$DEFAULT_SSH_KEY}
@@ -15,7 +15,7 @@ DROPLET_IPS=$(echo "$STACK_OUTPUT" | jq -r '.[]')
 
 # Variables
 USER="root"
-TMUX_SESSION_NAME="traces-1"
+TMUX_SESSION_NAME="traces"
 COMMAND=". ./payload/upload_traces.sh"
 
 # Function to start tmux session on a remote server

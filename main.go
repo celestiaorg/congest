@@ -74,16 +74,6 @@ func main() {
 		time.Sleep(time.Second)
 
 		pulumi.All(ips).ApplyT(func(_ []interface{}) error {
-			err = n.InitNodes(payloadRoot)
-			if err != nil {
-				panic(err)
-			}
-
-			err = n.SaveAddressBook(payloadRoot, n.Peers())
-			if err != nil {
-				panic(err)
-			}
-
 			err = n.SaveValidatorsToFile(filepath.Join(payloadRoot, "validators.json"))
 			if err != nil {
 				panic(err)
@@ -91,9 +81,7 @@ func main() {
 
 			return nil
 		})
-		time.Sleep(time.Second * 20)
 
 		return nil
 	})
-	time.Sleep(time.Second * 30)
 }

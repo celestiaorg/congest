@@ -28,6 +28,7 @@ force-down:
 deploy:
 	$(MAKE) EXPERIMENT_NAME=$(word 2,$(MAKECMDGOALS)) EXPERIMENT_CHAIN_ID=$(word 3,$(MAKECMDGOALS)) up
 
+# overwrite erases the current network and deploys a new one.
 
 JSON_FILE=./payload/ips.json
 

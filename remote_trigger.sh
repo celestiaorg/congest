@@ -1,12 +1,20 @@
 #!/bin/bash
 
-# Expand the SSH key path
-# Set default SSH key location
-DEFAULT_SSH_KEY="~/.ssh/id_ed25519"
+# Ensure two arguments are passed
+if [ "$#" -ne 2 ]; then
+  echo "Usage: $0 <tmux-session-name> <script-name>"
+fi
 
-# Allow user to override the SSH key location
+# Arguments
+TMUX_SESSION_NAME=$1
+SCRIPT_NAME=$2
+PAYLOAD_PATH="/root/payload"
+
+# Expand the SSH key path
+DEFAULT_SSH_KEY="~/.ssh/id_ed25519"
 SSH_KEY=${SSH_KEY:-$DEFAULT_SSH_KEY}
 
+# Timeout for operations
 TIMEOUT=60
 
 # Fetch the IP addresses from Pulumi stack outputs
@@ -15,16 +23,15 @@ DROPLET_IPS=$(echo "$STACK_OUTPUT" | jq -r '.[]')
 
 # Variables
 USER="root"
-TMUX_SESSION_NAME="app"
-COMMAND="export SEEN_LIMI=\"84\""
 
 # Function to start tmux session on a remote server
-change_var() {
+start_tmux_session() {
   local IP=$1
   {
     echo "Starting tmux session on $IP -----------------------------------------------------"
-    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${SSH_KEY} ${USER}@${IP} << EOF
-tmux send-keys -t ${TMUX_SESSION_NAME} "${COMMAND}" C-m
+    ssh -t -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${SSH_KEY} ${USER}@${IP} << EOF
+tmux new-session -d -s ${TMUX_SESSION_NAME}
+tmux send-keys -t ${TMUX_SESSION_NAME} "bash ${PAYLOAD_PATH}/${SCRIPT_NAME}" C-m
 EOF
     echo "Tmux session started on $IP"
   } &
@@ -39,7 +46,7 @@ EOF
   fi
 }
 
-# Loop through the IPs and run the start_tmux_session function in parallel
+# Loop through IP addresses and trigger the tmux session asynchronously
 for IP in $DROPLET_IPS; do
   start_tmux_session "$IP" &
 done
