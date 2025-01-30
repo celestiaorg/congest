@@ -10,21 +10,21 @@ import (
 )
 
 const (
-	// TestConfigKey is the key used to retrieve which test is being ran from
+	// TestConfigKey is the key used to retrieve which test is being run from
 	// the pulumi config. This value can be set by running `pulumi config set test TestName`
 	TestConfigKey = "test"
 
-	// RegionsConfgKey is the key used to retrieve the regions that the network
+	// RegionsConfigKey is the key used to retrieve the regions that the network
 	// should be deployed to from the pulumi config. This value can be set by
 	// running `pulumi config set regions Full`.
-	RegionsConfgKey = "regions"
+	RegionsConfigKey = "regions"
 
 	// ChainIDConfigKey is the key used to retrieve the chain ID that the network
 	// should be deployed with from the pulumi config. This value can be set by
-	// running `pulumi config set chainID ChainID`.
+	// running `pulumi config set chainID <chain_id>`.
 	ChainIDConfigKey = "chainID"
 
-	// GlobalTimeout is passed to all pulumi resources to ensure that they do
+	// GlobalTimeoutString is passed to all pulumi resources to ensure that they do
 	// not stay alive too long.
 	GlobalTimeoutString = "30m"
 )

@@ -23,13 +23,13 @@ func NewDigitalOcean(timeout string) (*DigitalOcean, error) {
 	rawDOSshIDs := os.Getenv("DO_SSH_KEY_IDS")
 	if rawDOSshIDs == "" {
 		fmt.Println("no raw ssh key")
-		return nil, fmt.Errorf("No SSH IDs provided, please provide a list of SSH IDs in the DO_SSH_IDS environment variable")
+		return nil, fmt.Errorf("no SSH IDs provided, please provide a list of SSH IDs in the DO_SSH_KEY_IDS environment variable")
 	}
 
 	sshIDs := strings.Split(rawDOSshIDs, ",")
 	if len(sshIDs) == 0 {
 		fmt.Println("no shh keys from parsing")
-		return nil, fmt.Errorf("No SSH IDs provided, please provide a list of SSH IDs in the DO_SSH_IDS environment variable")
+		return nil, fmt.Errorf("no SSH IDs provided, please provide a list of SSH IDs in the DO_SSH_KEY_IDS environment variable")
 	}
 
 	return &DigitalOcean{

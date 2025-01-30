@@ -5,21 +5,13 @@ CELES_HOME=".celestia-app"
 MONIKER="validator"
 ARCHIVE_NAME="payload.tar.gz"
 
-export DEBIAN_FRONTEND=noninteractive 
-
-export SEEN_LIMIT="74" # don't forget to change this!!!
-export INCLUSION_DELAY="45"
+export DEBIAN_FRONTEND=noninteractive
 
 apt update -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-apt-get install git build-essential ufw curl jq chrony snapd --yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-
-ufw allow 26657/tcp
-ufw allow 26656/tcp
-ufw allow 26657/udp
-ufw allow 26656/udp
+apt-get install git build-essential curl jq chrony snapd --yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 
 systemctl enable chrony
 systemctl start chrony
@@ -128,12 +120,12 @@ source payload/txsim.sh
 HOSTNAME=$(hostname)
 
 # Base command
-COMMAND="celestia-appd start --force-no-bbr"
+COMMAND="celestia-appd start"
 
 # Define log file path
 LOG_FILE="/root/logs"
 
-Check if the hostname matches the specific value
+# Check if the hostname matches the specific value
 if [[ "$HOSTNAME" == "validator-2" ]]; then
     # If it matches, don't add the log level flag
     echo "Starting celestia-appd without log level flag on $HOSTNAME"
